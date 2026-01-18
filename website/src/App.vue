@@ -8,7 +8,7 @@ import { RouterView } from 'vue-router'
     <header class="main-header glass-panel">
       <div class="container header-content">
         <router-link to="/" class="logo-link">
-          <img src="../assets/logo.png" alt="EntglDb" class="logo-img" />
+          <img src="./assets/logo.png" alt="EntglDb" class="logo-img" />
           <div class="logo-text">EntglDb<span class="dot">.</span></div>
         </router-link>
         <nav>
