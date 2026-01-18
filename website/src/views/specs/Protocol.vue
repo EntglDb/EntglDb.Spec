@@ -1,71 +1,108 @@
 <template>
   <div class="spec-view">
     <h1>Wire Protocol</h1>
-    <p class="lead">EntglDb establishes a secure, framed TCP connection on Port 25000.</p>
+    <p class="lead">EntglDb implements a custom secure transport layer inspired by the <a href="http://noiseprotocol.org/" target="_blank" class="highlight">Noise Protocol Framework</a> (<strong>NN Pattern</strong>).</p>
 
-    <h2>Message Framing</h2>
-    <p>Every message is prefixed with a 4-byte Signed Integer (Big Endian) indicating the payload length.</p>
+    <h2>Security Handshake (Noise NN)</h2>
+    <p>The handshake provides mutual authentication and establishes ephemeral session keys without requiring long-term static keys (for now).</p>
     
-    <div class="packet-visual">
-      <div class="packet-part header">
-        <span class="label">Length</span>
-        <span class="value">4 Bytes</span>
-      </div>
-      <div class="packet-part payload">
-        <span class="label">Payload</span>
-        <span class="value">N Bytes (Protobuf)</span>
-      </div>
-    </div>
-
-    <h2>Handshake Flow</h2>
     <div class="flow-diagram">
       <div class="step">
-        <div class="node">Client</div>
-        <div class="arrow">Running ECDH (P-256)</div>
-        <div class="node">Server</div>
+        <div class="node">Initiator</div>
+        <div class="arrow">ECDH P-256</div>
+        <div class="node">Responder</div>
       </div>
       
       <div class="msg-box">
         <span class="msg-arrow">➔</span>
-        <strong>Client Hello</strong>
-        <code class="mini-code">[Public Key A]</code>
+        <strong>Alice</strong> sends Ephemeral Public Key
+        <code class="mini-code">Bytes(65)</code>
       </div>
 
       <div class="msg-box">
         <span class="msg-arrow">➔</span>
-        <strong>Server Hello</strong>
-        <code class="mini-code">[Public Key B] + [Salt]</code>
+        <strong>Bob</strong> sends Ephemeral Public Key
+        <code class="mini-code">Bytes(65) + Salt</code>
       </div>
 
       <div class="action-box">
-        Both derive <strong>Shared Secret</strong> via ECDH + HKDF
+        <strong>HKDF Derivation</strong><br>
+        SharedSecret = ECDH(Alice.Priv, Bob.Pub)<br>
+        Keys = HKDF(SharedSecret, Salt)
       </div>
 
       <div class="msg-box encrypted">
         <span class="msg-arrow">🔒</span>
-        <strong>Encrypted Channel Established</strong>
+        <strong>Secure Transport</strong>
         <small>AES-256-GCM</small>
       </div>
     </div>
 
-    <h2>Encryption Standards</h2>
-    <div class="grid-card">
-      <div class="card-item">
-        <strong>Key Exchange</strong>
-        <span>ECDH P-256</span>
-      </div>
-      <div class="card-item">
-        <strong>Cipher</strong>
-        <span>AES/GCM/NoPadding</span>
-      </div>
-      <div class="card-item">
-        <strong>Key Size</strong>
-        <span>256-bit</span>
-      </div>
-      <div class="card-item">
-        <strong>Auth Tag</strong>
-        <span>128-bit</span>
-      </div>
+    <h2>Protobuf Definitions</h2>
+    <p>All payload messages are serialized using Google Protocol Buffers (v3).</p>
+    <div class="code-block scrollable">
+      <pre><code>syntax = "proto3";
+
+package EntglDb.Network.Proto;
+
+option java_package = "com.entgldb.network.proto";
+option csharp_namespace = "EntglDb.Network.Proto";
+
+// Core Handshake
+message HandshakeRequest {
+  string node_id = 1;
+  string auth_token = 2;
+}
+
+message HandshakeResponse {
+  string node_id = 1;
+  bool accepted = 2;
+}
+
+// Logical Clocks
+message GetClockRequest {}
+message ClockResponse {
+  int64 hlc_wall = 1;
+  int32 hlc_logic = 2;
+  string hlc_node = 3;
+}
+
+// Synchronization
+message PullChangesRequest {
+  int64 since_wall = 1;
+  int32 since_logic = 2;
+  string since_node = 3;
+}
+
+message ChangeSetResponse {
+  repeated ProtoOplogEntry entries = 1;
+}
+
+message PushChangesRequest {
+  repeated ProtoOplogEntry entries = 1;
+}
+
+message AckResponse {
+  bool success = 1;
+}
+
+// Data Structure
+message ProtoOplogEntry {
+  string collection = 1;
+  string key = 2;
+  string operation = 3; // "Put" or "Delete"
+  string json_data = 4;
+  int64 hlc_wall = 5;
+  int32 hlc_logic = 6;
+  string hlc_node = 7;
+}
+
+// Wire Framing
+message SecureEnvelope {
+  bytes ciphertext = 1;
+  bytes nonce = 2;
+  bytes auth_tag = 3;
+}</code></pre>
     </div>
   </div>
 </template>
@@ -77,44 +114,10 @@
   margin-bottom: 40px;
 }
 
-.packet-visual {
-  display: flex;
-  font-family: var(--font-mono);
-  margin: 40px 0;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid var(--border-color);
-}
-
-.packet-part {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.packet-part.header {
-  background: var(--accent-primary);
-  color: #fff;
-  width: 120px;
-}
-
-.packet-part.payload {
-  background: rgba(255, 255, 255, 0.05);
-  flex: 1;
-  color: var(--text-primary);
-}
-
-.label {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-  opacity: 0.8;
-}
-
-.value {
-  font-weight: 600;
+.highlight {
+  color: var(--accent-secondary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 .flow-diagram {
@@ -151,11 +154,14 @@
 
 .action-box {
   text-align: center;
-  padding: 10px;
-  font-style: italic;
-  color: var(--extension-text); /* Fallback */ 
-  color: var(--text-muted);
-  font-size: 0.9rem;
+  padding: 20px;
+  margin: 20px 0;
+  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.6;
 }
 
 .mini-code {
@@ -167,31 +173,19 @@
   margin-left: auto;
 }
 
-.grid-card {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 20px;
-  margin-top: 40px;
-}
-
-.card-item {
-  background: rgba(255,255,255,0.03);
+.code-block {
+  background: #0f0f13;
   padding: 20px;
   border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.card-item strong {
-  margin-bottom: 8px;
-  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  font-family: var(--font-mono);
   font-size: 0.9rem;
+  line-height: 1.5;
+  color: #a1a1aa;
 }
 
-.card-item span {
-  font-weight: 600;
-  color: var(--accent-primary);
+.scrollable {
+  max-height: 500px;
+  overflow-y: auto;
 }
 </style>

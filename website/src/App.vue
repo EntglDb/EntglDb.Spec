@@ -7,11 +7,15 @@ import { RouterView } from 'vue-router'
     <!-- Header will replace this placeholder -->
     <header class="main-header glass-panel">
       <div class="container header-content">
-        <div class="logo">EntglDb<span class="dot">.</span></div>
+        <router-link to="/" class="logo-link">
+          <img src="../assets/logo.png" alt="EntglDb" class="logo-img" />
+          <div class="logo-text">EntglDb<span class="dot">.</span></div>
+        </router-link>
         <nav>
           <router-link to="/">Home</router-link>
           <router-link to="/docs">Docs</router-link>
           <router-link to="/roadmap">Roadmap</router-link>
+          <a href="https://github.com/EntglDb" target="_blank" class="github-link">GitHub ↗</a>
         </nav>
       </div>
     </header>
@@ -57,14 +61,33 @@ import { RouterView } from 'vue-router'
   height: 100%;
 }
 
-.logo {
+.logo-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.logo-link:hover {
+  opacity: 0.8;
+}
+
+.logo-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.logo-text {
   font-family: var(--font-mono);
   font-weight: 700;
   font-size: 1.25rem;
   letter-spacing: -0.5px;
+  color: var(--text-primary);
 }
 
-.logo .dot {
+.logo-text .dot {
   color: var(--accent-primary);
 }
 
@@ -81,6 +104,11 @@ nav a {
 
 nav a:hover, nav a.router-link-active {
   color: var(--text-primary);
+}
+
+.github-link {
+  color: var(--accent-primary) !important;
+  font-weight: 600 !important;
 }
 
 main {
