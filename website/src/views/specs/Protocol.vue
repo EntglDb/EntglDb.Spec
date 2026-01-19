@@ -6,6 +6,29 @@
     <h2>Security Handshake (Noise NN)</h2>
     <p>The handshake provides mutual authentication and establishes ephemeral session keys without requiring long-term static keys (for now).</p>
     
+    <h2>Message Framing (v0.7.0)</h2>
+    <p>Every message is prefixed with a 4-byte Length plus a 1-byte <strong>Compression Flag</strong>.</p>
+    
+    <div class="packet-visual">
+      <div class="packet-part header">
+        <span class="label">Length</span>
+        <span class="value">4 Bytes</span>
+      </div>
+      <div class="packet-part flag">
+        <span class="label">Comp</span>
+        <span class="value">1 Byte</span>
+      </div>
+      <div class="packet-part payload">
+        <span class="label">Payload</span>
+        <span class="value">N Bytes (Protobuf)</span>
+      </div>
+    </div>
+
+    <div class="alert-box">
+      <strong>Compression Logic (Brotli)</strong>
+      <p>If flag is <code>0x01</code>, payload is Brotli-compressed. Threshold: 1024 bytes.</p>
+    </div>
+
     <div class="flow-diagram">
       <div class="step">
         <div class="node">Initiator</div>
@@ -15,14 +38,14 @@
       
       <div class="msg-box">
         <span class="msg-arrow">➔</span>
-        <strong>Alice</strong> sends Ephemeral Public Key
-        <code class="mini-code">Bytes(65)</code>
+        <strong>Client Hello</strong>
+        <code class="mini-code">Key + Comp:["brotli"]</code>
       </div>
 
       <div class="msg-box">
         <span class="msg-arrow">➔</span>
-        <strong>Bob</strong> sends Ephemeral Public Key
-        <code class="mini-code">Bytes(65) + Salt</code>
+        <strong>Server Hello</strong>
+        <code class="mini-code">Key + Salt + Comp:"brotli"</code>
       </div>
 
       <div class="action-box">
@@ -114,6 +137,12 @@ message SecureEnvelope {
   margin-bottom: 40px;
 }
 
+.packet-part.flag {
+  background: var(--accent-secondary);
+  color: #000;
+  width: 80px;
+}
+
 .highlight {
   color: var(--accent-secondary);
   text-decoration: underline;
@@ -187,5 +216,19 @@ message SecureEnvelope {
 .scrollable {
   max-height: 500px;
   overflow-y: auto;
+}
+
+.alert-box {
+  background: rgba(139, 92, 246, 0.1);
+  border-left: 3px solid var(--accent-primary);
+  padding: 16px;
+  border-radius: 4px;
+  margin: 20px 0;
+}
+
+.alert-box strong {
+  color: var(--accent-primary);
+  display: block;
+  margin-bottom: 4px;
 }
 </style>

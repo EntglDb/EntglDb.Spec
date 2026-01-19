@@ -4,19 +4,42 @@
 Once peers discover each other via UDP, they establish a secure **TCP Connection** for data synchronization.
 The default port for TCP services is **25000**.
 
-## Framing
-EntglDb uses a simple Length-Prefix framing for all TCP messages.
+### Message Framing (v0.7.0+)
+The TCP stream uses a Length-Prefixed framing with an additional **Compression Flag**.
 
 ```
-[Length (4 bytes)] [Payload (N bytes)]
+[Length (4 bytes)] [Compression (1 byte)] [Payload (N bytes)]
 ```
 
-*   **Length**: 4-byte signed integer (Big Endian). Indicates size of Payload.
-*   **Payload**: The actual message data (Protobuf or Handshake Token).
+- **Length**: 4-byte Signed Integer (Big Endian), inclusive of the Compression byte.
+  - *Example*: If payload is 100 bytes + 1 byte flag, Length = 101.
+- **Compression**: 1-byte enum.
+  - `0x00`: **None** (Raw Protobuf)
+  - `0x01`: **Brotli** (Compressed Protobuf)
+- **Payload**: The serialized (and potentially compressed) Protobuf message.
+- **Threshold**: Payloads smaller than **1024 bytes** should NOT be compressed (`0x00`).
+
+### Encryption
+The entire frame *payload* (after compression) is encrypted using AES-256-GCM.
+**Order of Operations**: Serialize -> Compress -> Encrypt -> Send.
 
 ## Handshake & Security
 
 All connections must be authenticated and encrypted using **AES-256-GCM** and **ECDH**.
+
+### Handshake & Negotiation
+Nodes perform a handshake to authenticate and negotiate capabilities (like compression).
+
+#### 1. HandshakeRequest (Client -> Server)
+- `node_id`: Identity of the connecting peer.
+- `supported_compression`: List of algorithms (e.g., `["brotli"]`).
+
+#### 2. HandshakeResponse (Server -> Client)
+- `node_id`: Identity of the server.
+- `accepted`: Boolean.
+- `selected_compression`: The algorithm chosen by the server (e.g., `"brotli"` or `""`).
+
+If `brotli` is selected, all subsequent messages > 1KB MUST be compressed.
 
 ### 1. Key Exchange (ECDH)
 *   Curve: `NIST P-256` (prime256v1)
