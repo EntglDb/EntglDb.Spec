@@ -1,21 +1,55 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { computed } from 'vue'
+import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
+
+const route = useRoute()
+const router = useRouter()
+
+const versions = ['v0.7.0']
+const currentVersion = computed(() => {
+  return (route.params.version as string) || 'v0.7.0'
+})
 
 const menu = [
-  { label: 'Discovery & Transport', path: '/docs/discovery' },
-  { label: 'Wire Protocol', path: '/docs/protocol' },
-  { label: 'Data Model & JSON', path: '/docs/data-model' },
-  { label: 'Synchronization', path: '/docs/synchronization' }
+  { label: 'Getting Started', path: 'getting-started' },
+  { label: 'Architecture', path: 'architecture' },
+  { label: 'Security', path: 'security' },
+  { label: 'Conflict Resolution', path: 'conflict-resolution' },
+  { label: 'Android Robustness', path: 'android-robustness' },
+  { label: 'Discovery & Transport', path: 'discovery' },
+  { label: 'Wire Protocol', path: 'protocol' },
+  { label: 'Data Model & JSON', path: 'data-model' },
+  { label: 'Querying', path: 'querying' },
+  { label: 'Synchronization', path: 'synchronization' }
 ]
+
+function onVersionChange(event: Event) {
+  const newVersion = (event.target as HTMLSelectElement).value
+  // Keep the current page if possible, else default to discovery
+  const page = route.path.split('/').pop() || 'discovery'
+  router.push(`/docs/${newVersion}/${page}`)
+}
 </script>
 
 <template>
   <div class="docs-layout container">
     <aside class="docs-sidebar">
+      <div class="version-selector">
+        <label>Version</label>
+        <select :value="currentVersion" @change="onVersionChange">
+          <option v-for="v in versions" :key="v" :value="v">{{ v }}</option>
+        </select>
+      </div>
+
       <h3>Specifications</h3>
       <ul>
         <li v-for="item in menu" :key="item.path">
-          <RouterLink :to="item.path" class="doc-link">{{ item.label }}</RouterLink>
+          <RouterLink 
+            :to="`/docs/${currentVersion}/${item.path}`" 
+            class="doc-link"
+          >
+            {{ item.label }}
+          </RouterLink>
         </li>
       </ul>
     </aside>
@@ -45,6 +79,44 @@ const menu = [
   top: var(--header-height);
   height: calc(100vh - var(--header-height));
   overflow-y: auto;
+}
+
+.version-selector {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.version-selector label {
+  display: block;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.5px;
+}
+
+.version-selector select {
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.version-selector select:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--text-secondary);
+}
+
+.version-selector select:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
 }
 
 .docs-sidebar h3 {

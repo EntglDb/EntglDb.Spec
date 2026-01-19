@@ -12,13 +12,26 @@ const router = createRouter({
         {
             path: '/docs',
             name: 'docs',
-            component: () => import('../views/Docs.vue'),
+            component: () => import('vue-router').then(m => m.RouterView), // Use simple passthrough
             children: [
-                { path: '', redirect: '/docs/discovery' },
-                { path: 'discovery', component: () => import('../views/specs/Discovery.vue') },
-                { path: 'protocol', component: () => import('../views/specs/Protocol.vue') },
-                { path: 'data-model', component: () => import('../views/specs/DataModel.vue') },
-                { path: 'synchronization', component: () => import('../views/specs/Sync.vue') }
+                { path: '', redirect: '/docs/v0.7.0/getting-started' },
+                {
+                    path: ':version',
+                    component: () => import('../views/Docs.vue'), // Layout applies here
+                    children: [
+                        { path: '', redirect: to => `/docs/${to.params.version}/getting-started` },
+                        { path: 'getting-started', component: () => import('../views/specs/GettingStarted.vue') },
+                        { path: 'architecture', component: () => import('../views/specs/Architecture.vue') },
+                        { path: 'security', component: () => import('../views/specs/Security.vue') },
+                        { path: 'conflict-resolution', component: () => import('../views/specs/ConflictResolution.vue') },
+                        { path: 'android-robustness', component: () => import('../views/specs/AndroidRobustness.vue') },
+                        { path: 'discovery', component: () => import('../views/specs/Discovery.vue') },
+                        { path: 'protocol', component: () => import('../views/specs/Protocol.vue') },
+                        { path: 'data-model', component: () => import('../views/specs/DataModel.vue') },
+                        { path: 'querying', component: () => import('../views/specs/Querying.vue') },
+                        { path: 'synchronization', component: () => import('../views/specs/Sync.vue') }
+                    ]
+                }
             ]
         },
         {
