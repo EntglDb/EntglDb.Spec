@@ -11,7 +11,7 @@ The TCP stream uses a Length-Prefixed framing with an additional **Compression F
 [Length (4 bytes)] [Compression (1 byte)] [Payload (N bytes)]
 ```
 
-- **Length**: 4-byte Signed Integer (Big Endian), inclusive of the Compression byte.
+- **Length**: 4-byte Signed Integer (**Little Endian**), inclusive of the Compression byte. 
   - *Example*: If payload is 100 bytes + 1 byte flag, Length = 101.
 - **Compression**: 1-byte enum.
   - `0x00`: **None** (Raw Protobuf)

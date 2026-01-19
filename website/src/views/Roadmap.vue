@@ -7,13 +7,17 @@
 
     <div class="timeline">
       <div class="timeline-item animate-fade-in" style="animation-delay: 0.1s">
-        <div class="timeline-marker future"></div>
+        <div class="timeline-marker released"></div>
         <div class="timeline-content">
-          <h3>Optimization</h3>
+          <h3>v0.7.0 Released</h3>
           <ul class="feature-list">
+             <li>
+              <strong>Protocol v4 & Brotli Compression</strong>
+              <p>Unified secure transport with native Brotli compression for efficient synchronization.</p>
+            </li>
             <li>
-              <strong>Data Compression (Brotli)</strong>
-              <p>Native Brotli compression for synchronization payloads to reduce bandwidth usage.</p>
+              <strong>Unified Versioning</strong>
+              <p>All core packages (.NET, Kotlin, Node.js) synchronized to v0.7.0.</p>
             </li>
           </ul>
         </div>
@@ -105,6 +109,11 @@
 .timeline-marker.future {
   background: var(--accent-secondary);
   box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+}
+
+.timeline-marker.released {
+  background: var(--accent-primary);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.6);
 }
 
 .timeline-content h3 {

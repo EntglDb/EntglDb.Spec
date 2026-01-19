@@ -7,7 +7,7 @@
     <p>The handshake provides mutual authentication and establishes ephemeral session keys without requiring long-term static keys (for now).</p>
     
     <h2>Message Framing (v0.7.0)</h2>
-    <p>Every message is prefixed with a 4-byte Length plus a 1-byte <strong>Compression Flag</strong>.</p>
+    <p>Every message is prefixed with a 4-byte Length (<strong>Little Endian</strong>) plus a 1-byte <strong>Compression Flag</strong>.</p>
     
     <div class="packet-visual">
       <div class="packet-part header">

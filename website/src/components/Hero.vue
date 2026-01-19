@@ -17,7 +17,7 @@ const goGithub = () => window.open('https://github.com/EntglDb', '_blank');
     
     <div class="container hero-content">
       <div class="badge animate-fade-in" style="animation-delay: 0.1s">
-        <span class="badge-dot"></span> v0.6.1 Released
+        <span class="badge-dot"></span> v0.7.0 Released
       </div>
       
       <h1 class="hero-title animate-fade-in" style="animation-delay: 0.2s">
