@@ -5,14 +5,15 @@ import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
 
-const versions = ['v0.7.0']
+const versions = ['v0.8.0', 'v0.7.0']
 const currentVersion = computed(() => {
-  return (route.params.version as string) || 'v0.7.0'
+  return (route.params.version as string) || 'v0.8.0'
 })
 
 const menu = [
   { label: 'Getting Started', path: 'getting-started' },
   { label: 'Architecture', path: 'architecture' },
+  { label: 'Dynamic Reconfiguration', path: 'dynamic-reconfiguration' },
   { label: 'Security', path: 'security' },
   { label: 'Conflict Resolution', path: 'conflict-resolution' },
   { label: 'Android Robustness', path: 'android-robustness' },

@@ -9,6 +9,23 @@
       <div class="timeline-item animate-fade-in" style="animation-delay: 0.1s">
         <div class="timeline-marker released"></div>
         <div class="timeline-content">
+          <h3>v0.8.0 Released</h3>
+          <ul class="feature-list">
+             <li>
+              <strong>Dynamic Reconfiguration</strong>
+              <p>Change server roles, listening ports, and database identity without process restarts.</p>
+            </li>
+            <li>
+              <strong>Known Peers & Leader Election</strong>
+              <p>Support for persistent static peers and automated Bully Algorithm for cloud gateway election.</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="timeline-item animate-fade-in" style="animation-delay: 0.2s">
+        <div class="timeline-marker released"></div>
+        <div class="timeline-content">
           <h3>v0.7.0 Released</h3>
           <ul class="feature-list">
              <li>

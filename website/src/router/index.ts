@@ -14,7 +14,7 @@ const router = createRouter({
             name: 'docs',
             component: () => import('vue-router').then(m => m.RouterView), // Use simple passthrough
             children: [
-                { path: '', redirect: '/docs/v0.7.0/getting-started' },
+                { path: '', redirect: '/docs/v0.8.0/getting-started' },
                 {
                     path: ':version',
                     component: () => import('../views/Docs.vue'), // Layout applies here
@@ -22,6 +22,7 @@ const router = createRouter({
                         { path: '', redirect: to => `/docs/${to.params.version}/getting-started` },
                         { path: 'getting-started', component: () => import('../views/specs/GettingStarted.vue') },
                         { path: 'architecture', component: () => import('../views/specs/Architecture.vue') },
+                        { path: 'dynamic-reconfiguration', component: () => import('../views/specs/DynamicReconfiguration.vue') },
                         { path: 'security', component: () => import('../views/specs/Security.vue') },
                         { path: 'conflict-resolution', component: () => import('../views/specs/ConflictResolution.vue') },
                         { path: 'android-robustness', component: () => import('../views/specs/AndroidRobustness.vue') },

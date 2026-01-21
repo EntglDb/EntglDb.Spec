@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This template is for creating an Internet Draft using xml2rfc,
+     which is available here: http://xml.resource.org. -->
+<!DOCTYPE rfc [
+  <!ENTITY nbsp    "&#160;">
+  <!ENTITY zwsp   "&#8203;">
+  <!ENTITY nbhy   "&#8209;">
+  <!ENTITY wj     "&#8288;">
+]>
+<!--
+    * docName should be the name of your draft
+    * category values: std, bcp, info, exp, and historic
+    * ipr values: trust200902, noModificationTrust200902, noDerivativesTrust200902, pre5378Trust200902
+    * submissionType values: IETF, IAB, IRTF, and independent
+-->
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude"
+     docName="draft-entgldb-p2p-protocol-00"
+     category="info"
+     ipr="trust200902"
+     submissionType="independent"
+     version="3">
+
+  <front>
+    <title abbrev="EntglDb Protocol">EntglDb Peer-to-Peer Communication and Security Protocol</title>
+    
+    <author fullname="EntglDb Maintainers" initials="E." surname="Maintainers">
+      <organization>EntglDb</organization>
+      <address>
+        <postal>
+          <country>Italy</country>
+        </postal>
+        <email>info@entgldb.com</email>
+      </address>
+    </author>
+
+    <date year="2026" month="January" day="21"/>
+    <area>General</area>
+    <workgroup>EntglDb Working Group</workgroup>
+    <keyword>p2p</keyword>
+    <keyword>synchronization</keyword>
+    <keyword>database</keyword>
+
+    <abstract>
+      <t>This document specifies the peer-to-peer communication protocol used by EntglDb, a decentralized database system. It defines the mechanisms for local node discovery via UDP, secure connection establishment over TCP using ECDH and AES-GCM, and the message framing and synchronization flow required for data consistency across nodes.</t>
+    </abstract>
+  </front>
+
+  <middle>
+    <section anchor="intro">
+      <name>Introduction</name>
+      <t>EntglDb requires a robust protocol to enable multiple nodes (peers) to discover each other on a local network, establish a secure communication channel, and synchronize data efficiently.</t>
+      <t>This specification details the wire format, discovery beacons, handshake procedures, and security requirements to ensure interoperability between different EntglDb client implementations.</t>
+      
+      <section anchor="requirements">
+        <name>Requirements Language</name>
+        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 <xref target="RFC2119"/> <xref target="RFC8174"/> when, and only when, they appear in all capitals, as shown here.</t>
+      </section>
+    </section>
+
+    <section anchor="discovery">
+      <name>Discovery Protocol</name>
+      <t>Nodes automatically discover each other using UDP broadcasts.</t>
+      
+      <section>
+        <name>Beacon Constants</name>
+        <ul>
+          <li><strong>Port:</strong> 25000</li>
+          <li><strong>Interval:</strong> 5000 ms</li>
+          <li><strong>Transport:</strong> UDP Broadcast/Multicast</li>
+        </ul>
+      </section>
+
+      <section>
+        <name>Beacon Payload</name>
+        <t>The payload MUST be a UTF-8 encoded JSON string adhering to the following structure:</t>
+        <sourcecode type="json">
+{
+  "node_id": "UUID-STRING",
+  "tcp_port": 25000
+}
+        </sourcecode>
+        <t>Receiving nodes MUST ignore beacons originating from their own <tt>node_id</tt>.</t>
+      </section>
+    </section>
+
+    <section anchor="tcp_connection">
+      <name>TCP Connection and Framing</name>
+      <t>Upon discovery, a node initiates a TCP connection to the advertised IP and <tt>tcp_port</tt>.</t>
+      
+      <section>
+        <name>Frame Structure</name>
+        <t>All messages sent over the TCP stream MUST adhere to the following length-prefixed format. All integers are Little Endian.</t>
+        <artwork>
++----------------+--------------+-----------------+------------------+
+| Length (4 bytes)| Type (1 byte)| Compress (1 byte)| Payload (N bytes)|
++----------------+--------------+-----------------+------------------+
+        </artwork>
+        <ul>
+          <li><strong>Length:</strong> 32-bit signed integer representing the size of the <strong>Payload</strong> only. It does NOT include the header size (6 bytes).</li>
+          <li><strong>Type:</strong> 1-byte enum identifying the message type.</li>
+          <li><strong>Compression:</strong> 1-byte flag. <tt>0x00</tt> = None, <tt>0x01</tt> = Brotli.</li>
+          <li><strong>Payload:</strong> The serialized Protocol Buffer message.</li>
+        </ul>
+      </section>
+
+      <section>
+        <name>Message Types</name>
+        <t>The <tt>Type</tt> byte corresponds to the following values:</t>
+        <table align="center">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>HandshakeReq</td><td>Connection connection request</td></tr>
+            <tr><td>2</td><td>HandshakeRes</td><td>Connection response</td></tr>
+            <tr><td>3</td><td>GetClockReq</td><td>Request current HLC</td></tr>
+            <tr><td>4</td><td>ClockRes</td><td>HLC response</td></tr>
+            <tr><td>5</td><td>PullChangesReq</td><td>Request Oplog diff</td></tr>
+            <tr><td>6</td><td>ChangeSetRes</td><td>Send batch of changes</td></tr>
+            <tr><td>7</td><td>PushChangesReq</td><td>Proactive changes push</td></tr>
+            <tr><td>8</td><td>AckRes</td><td>Receipt confirmation</td></tr>
+            <tr><td>9</td><td>SecureEnv</td><td>Encrypted envelope</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </section>
+
+    <section anchor="security">
+      <name>Security and Handshake</name>
+      <t>Security is mandatory. The protocol enforces an encrypted channel using ECDH for key exchange and AES-GCM for confidentiality and integrity.</t>
+
+      <section>
+        <name>Phase 1: ECDH Key Exchange</name>
+        <t>Before any Protobuf messages are exchanged, a raw key exchange occurs:</t>
+        <ol>
+          <li><strong>Initiator</strong> sends: 4-byte Length + Public Key (NIST P-256 SubjectPublicKeyInfo).</li>
+          <li><strong>Responder</strong> sends: 4-byte Length + Public Key (NIST P-256 SubjectPublicKeyInfo).</li>
+        </ol>
+        <t>Both parties compute the <strong>Shared Secret</strong>. Session keys are derived using a simplified HKDF-like scheme:</t>
+        <ul>
+          <li><tt>Key1 = SHA256(Secret || 0x00)</tt></li>
+          <li><tt>Key2 = SHA256(Secret || 0x01)</tt></li>
+        </ul>
+        <t>The Initiator uses Key1 for encryption and Key2 for decryption. The Responder uses Key2 for encryption and Key1 for decryption.</t>
+      </section>
+
+      <section>
+        <name>Phase 2: Secure Envelope</name>
+        <t>After key exchange, ALL subsequent frames MUST have <tt>Type = 9</tt> (SecureEnv).</t>
+        <t>The payload of a SecureEnv message is a Protobuf <tt>SecureEnvelope</tt>:</t>
+        <sourcecode type="protobuf">
+message SecureEnvelope {
+  bytes ciphertext = 1;
+  bytes nonce = 2; // 12 bytes
+  bytes auth_tag = 3; // 16 bytes
+}
+        </sourcecode>
+        <t>The <strong>plaintext</strong> inside the encrypted <tt>ciphertext</tt> contains the inner wire format:</t>
+        <artwork>
+[Type (1 byte)] [Compression (1 byte)] [Inner Payload]
+        </artwork>
+      </section>
+    </section>
+
+    <section anchor="security_considerations">
+      <name>Security Considerations</name>
+      <t>This protocol relies on the strength of NIST P-256 and AES-256-GCM. Implementers MUST ensure secure random number generation for ephemeral keys and nonces.</t>
+      <t><strong>Authentication:</strong> While the current handshake encrypts traffic, robust node authentication relies on the <tt>auth_token</tt> field in the <tt>HandshakeReq</tt>. Implementations SHOULD verify this token against a trusted authority or ACL.</t>
+      <t><strong>Man-in-the-Middle (MitM):</strong> The current ECDH exchange is anonymous. To prevent MitM attacks, future versions MAY include signing of the ephemeral public keys using a long-term identity key.</t>
+    </section>
+
+    <section anchor="iana">
+      <name>IANA Considerations</name>
+      <t>This document registers the following UDP/TCP port for EntglDb Discovery and Synchronization:</t>
+      <ul>
+        <li><strong>Port:</strong> 25000</li>
+        <li><strong>Use:</strong> EntglDb Beacon (UDP) and Sync Protocol (TCP)</li>
+      </ul>
+    </section>
+  </middle>
+
+  <back>
+    <references>
+      <name>References</name>
+      <references>
+        <name>Normative References</name>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml"/>
+        <xi:include href="https://bib.ietf.org/public/rfc/bibxml/reference.RFC.8174.xml"/>
+      </references>
+    </references>
+  </back>
+</rfc>

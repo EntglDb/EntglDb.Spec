@@ -66,10 +66,9 @@ server.start();</code></pre>
       <div class="tab-content" v-if="activeTab === 'kotlin'">
         <h2>Installation</h2>
         <p>Add dependencies to your <code>build.gradle.kts</code>.</p>
-        <pre><code class="language-kotlin">dependencies {
-    implementation("com.entgldb:core:0.7.0")
-    implementation("com.entgldb:network:0.7.0")
-    implementation("com.entgldb:persistence-sqlite-android:0.7.0")
+        <pre><code class="language-kotlin">    implementation("com.entgldb:core:0.8.0")
+    implementation("com.entgldb:network:0.8.0")
+    implementation("com.entgldb:persistence-sqlite-android:0.8.0")
 }</code></pre>
 
         <h2>Platform Setup</h2>
