@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EntglDb Project Proposals</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+
+        :root {
+            --primary: #3b82f6;
+            --secondary: #10b981;
+            --accent: #8b5cf6;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --text-light: #e2e8f0;
+            --text-dim: #94a3b8;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark);
+            color: var(--text-light);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Slide Container */
+        .slides-container {
+            height: 100vh;
+            width: 100vw;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        /* Individual Slide */
+        section {
+            height: 100vh;
+            width: 100vw;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+            background: radial-gradient(circle at center, #1e293b 0%, var(--dark) 100%);
+        }
+
+        /* Slide Content */
+        .content {
+            max-width: 1100px;
+            width: 100%;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 2rem;
+            filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.5));
+            animation: pulse-logo 3s infinite alternate;
+        }
+
+        @keyframes pulse-logo {
+            0% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.5));
+            }
+
+            100% {
+                transform: scale(1.05);
+                filter: drop-shadow(0 0 40px rgba(16, 185, 129, 0.5));
+            }
+        }
+
+        h1 {
+            font-size: 4.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        h2 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--light);
+            font-weight: 700;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            font-size: 1.4rem;
+            line-height: 1.6;
+            color: var(--text-dim);
+            margin-bottom: 1.5rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        a:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+
+        /* Grid Layout for tech slides */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+            border-radius: 16px;
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .card h4 {
+            color: var(--secondary);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            font-size: 1.1rem;
+            margin-bottom: 0;
+            text-align: left;
+        }
+
+        ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        li {
+            background: var(--glass);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            font-size: 1.1rem;
+            transition: all 0.2s;
+        }
+
+        li:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+            background: var(--primary);
+            color: white;
+            vertical-align: middle;
+        }
+
+        .tag.rust {
+            background: #ef4444;
+        }
+
+        .tag.go {
+            background: #0ea5e9;
+        }
+
+        .tag.net {
+            background: #8b5cf6;
+        }
+
+        .tag.cpp {
+            background: #3b82f6;
+        }
+
+        .tag.js {
+            background: #f59e0b;
+            color: black;
+        }
+
+        /* Navigation Dots */
+        .nav-dots {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: var(--primary);
+            transform: scale(1.3);
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        /* Abstract Shapes */
+        .shape {
+            position: absolute;
+            filter: blur(100px);
+            opacity: 0.3;
+            z-index: 0;
+            border-radius: 50%;
+        }
+
+        .shape-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--primary);
+            top: -100px;
+            left: -100px;
+            animation: drift 20s infinite alternate;
+        }
+
+        .shape-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--secondary);
+            bottom: -50px;
+            right: -50px;
+            animation: drift 15s infinite alternate-reverse;
+        }
+
+        .shape-3 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent);
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.2;
+        }
+
+        @keyframes drift {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(50px, 50px);
+            }
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 3rem;
+            padding: 1.2rem 3rem;
+            background: white;
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 800;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(255, 255, 255, 0.2);
+        }
+
+        .project-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 2.5rem;
+            border-radius: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .slide-number {
+            position: absolute;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            opacity: 0.5;
+        }
+
+        .github-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #24292e;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+        }
+
+        .github-btn:hover {
+            background: #2f363d;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+            color: white;
+        }
+
+        .github-icon {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="nav-dots" id="navDots"></div>
+
+    <div class="slides-container" id="slidesContainer">
+
+        <!-- TITLE SLIDE -->
+        <section id="slide-1">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="content">
+                <img src="../website/src/assets/logo.png" alt="EntglDb Logo" class="logo">
+                <h3>Ca' Foscari University of Venice</h3>
+                <h1>EntglDb Projects</h1>
+                <p>Advanced Distributed Database Development Projects<br>for Project Management Course</p>
+                <a href="#slide-2" class="btn">Discover EntglDb</a>
+            </div>
+            <span class="slide-number">01</span>
+        </section>
+
+        <!-- INTRO 1: VISION -->
+        <section id="slide-2">
+            <div class="shape shape-3"></div>
+            <div class="content">
+                <h3>The Vision</h3>
+                <h2>The Database for the<br>Decentralized Web</h2>
+                <p>EntglDb (Entangled Database) is built to empower applications that must run everywhere: from high-end
+                    servers to edge devices, without relying on a central authority.</p>
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>Offline-First</h4>
+                        <p>Applications continue to work seamlessly without internet connection. Data syncs
+                            automatically when online.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Peer-to-Peer</h4>
+                        <p>Direct device-to-device communication (Mesh Networking) bypasses the need for central cloud
+                            servers.</p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">02</span>
+        </section>
+
+        <!-- INTRO 2: OPEN SOURCE -->
+        <section id="slide-3">
+            <div class="content">
+                <h3>Open & Available</h3>
+                <h2>Open Source</h2>
+                <p>EntglDb is a fully Open Source project driven by the community.</p>
+                <p>The entire source code, documentation, and roadmap are publicly available on GitHub.</p>
+
+                <a href="https://github.com/EntglDb" target="_blank" class="github-btn">
+                    <svg class="github-icon" viewBox="0 0 24 24">
+                        <path
+                            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                    </svg>
+                    github.com/EntglDb
+                </a>
+            </div>
+            <span class="slide-number">03</span>
+        </section>
+
+        <!-- INTRO 3: ARCHITECTURE -->
+        <section id="slide-4">
+            <div class="content">
+                <h3>Architecture</h3>
+                <h2>Built for Resilience</h2>
+                <p>A modular, layered architecture designed for portability and performance.</p>
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>Core Layer</h4>
+                        <p>Handles Validations, CRDTs (Conflict-free Replicated Data Types), and Vector Clocks.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Network Layer</h4>
+                        <p>Abstracts transport protocols (TCP, WebSocket, Bluetooth) for agnostic P2P communication.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Persistence Layer</h4>
+                        <p>Pluggable storage engines. Currently supports SQLite, with planned support for LevelDB and
+                            others.</p>
+                    </div>
+                    <div class="card">
+                        <h4>API Layer</h4>
+                        <p>Simple, idiomatic APIs for .NET, Kotlin, Node.js, and more.</p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">04</span>
+        </section>
+
+        <!-- INTRO 4: DATA MODEL -->
+        <section id="slide-5">
+            <div class="content">
+                <h3>Data Model</h3>
+                <h2>Document Oriented</h2>
+                <p>Flexible schema-less JSON documents organized in Collections.</p>
+                <div class="project-card">
+                    <p style="text-align: left; font-family: monospace; color: var(--secondary);">
+                        {<br>
+                        &nbsp;&nbsp;"_id": "doc-uuid-1234",<br>
+                        &nbsp;&nbsp;"_version": "1-nodeA",<br>
+                        &nbsp;&nbsp;"type": "sensor_reading",<br>
+                        &nbsp;&nbsp;"data": { "temp": 24.5, "unit": "C" },<br>
+                        &nbsp;&nbsp;"timestamp": 1709230000<br>
+                        }
+                    </p>
+                    <p style="margin-top: 1rem; font-size: 1rem;">Every document carries its own version history (Vector
+                        Clock), enabling precise causal ordering across the distributed system.</p>
+                </div>
+            </div>
+            <span class="slide-number">05</span>
+        </section>
+
+        <!-- INTRO 5: SYNC -->
+        <section id="slide-6">
+            <div class="content">
+                <h3>Synchronization</h3>
+                <h2>Eventual Consistency</h2>
+                <p>EntglDb guarantees that all nodes will eventually reach the same state.</p>
+                <ul style="justify-content: center;">
+                    <li><strong>Hybrid Logical Clocks (HLC)</strong><br>Combines physical time with logical counters for
+                        robust ordering.</li>
+                    <li><strong>Anti-Entropy</strong><br>Efficiently exchanges missing data using Merkle Trees or Delta
+                        lists.</li>
+                    <li><strong>Gossip Protocol</strong><br>Rapid information dissemination across the cluster.</li>
+                </ul>
+            </div>
+            <span class="slide-number">06</span>
+        </section>
+
+        <!-- INTRO 6: SECURITY -->
+        <section id="slide-7">
+            <div class="content">
+                <h3>Security</h3>
+                <h2>Trust No One</h2>
+                <p>Security is not an afterthought; it's embedded in the protocol.</p>
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>E2E Encryption</h4>
+                        <p>All communication channels are encrypted using TLS 1.3 or equivalent secure tunnels.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Authentication</h4>
+                        <p>Nodes authenticate via cryptographic handshakes (Ed25519 signatures) or OAuth2 tokens.</p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">07</span>
+        </section>
+
+        <!-- TRANSITION TO PROJECTS -->
+        <section id="slide-8">
+            <div class="shape shape-1"></div>
+            <div class="content">
+                <h2>Project Proposals</h2>
+                <p>We are looking for talented teams to expand the ecosystem.</p>
+                <p>7 Challenging Projects across Mobile, Web, Desktop, and Backend.</p>
+                <div style="font-size: 3rem; margin-top: 1rem;">👇</div>
+            </div>
+            <span class="slide-number">08</span>
+        </section>
+
+        <!-- Project 1: Kotlin Gap -->
+        <section id="slide-9">
+            <div class="content">
+                <span class="tag net">.NET</span> <span class="tag">Kotlin</span>
+                <h2>Project 1: Kotlin Gap Implementation</h2>
+                <div class="project-card">
+                    <p><strong>Goal:</strong> Upgrade <code>EntglDb.Kotlin</code> to match the latest .Net v0.8.0
+                        capabilities.</p>
+                    <p style="text-align: left; margin-top: 1rem;"><strong>Key Tasks:</strong></p>
+                    <ul style="justify-content: flex-start;">
+                        <li>Implement <strong>Cloud Node</strong> connections</li>
+                        <li>Add <strong>OAuth2</strong> Client Credentials flow</li>
+                        <li>Port <strong>Bully Algorithm</strong> for Leader Election</li>
+                        <li>Implement <strong>Gap Recovery</strong> for efficient sync</li>
+                    </ul>
+                </div>
+            </div>
+            <span class="slide-number">09</span>
+        </section>
+
+        <!-- Project 2: NodeJs Gap -->
+        <section id="slide-10">
+            <div class="content">
+                <span class="tag net">.NET</span> <span class="tag js">Node.js</span>
+                <h2>Project 2: Node.js Gap Implementation</h2>
+                <div class="project-card">
+                    <p><strong>Goal:</strong> Align <code>EntglDb.NodeJs</code> with .Net v0.8.0 for full hybrid cloud
+                        interoperability.</p>
+                    <p style="text-align: left; margin-top: 1rem;"><strong>Key Tasks:</strong></p>
+                    <ul style="justify-content: flex-start;">
+                        <li>Implement <strong>Remote Peer Persistence</strong> (SQLite)</li>
+                        <li>Add <strong>OAuth2</strong> support for secure cloud access</li>
+                        <li>Implement <strong>Leader Election</strong> (TypeScript)</li>
+                        <li>Ensure <strong>Snapshot</strong> compatibility</li>
+                    </ul>
+                </div>
+            </div>
+            <span class="slide-number">10</span>
+        </section>
+
+        <!-- Project 3: C++ Implementation -->
+        <section id="slide-11">
+            <div class="content">
+                <span class="tag cpp">C++20</span>
+                <h2>Project 3: EntglDb.Cpp</h2>
+                <div class="project-card">
+                    <p><strong>Goal:</strong> Create a high-performance, cross-platform native implementation.</p>
+                    <p style="text-align: left; margin-top: 1rem;"><strong>Tech Stack:</strong> C++20, CMake, ASIO,
+                        SQLite, Protobuf.</p>
+                    <ul style="justify-content: flex-start;">
+                        <li>Core Engine (VectorClock, LWW)</li>
+                        <li><strong>ASIO</strong> based Async TCP Server</li>
+                        <li>Secure Handshake Protocol</li>
+                        <li>Native SQLite persistence layer</li>
+                    </ul>
+                </div>
+            </div>
+            <span class="slide-number">11</span>
+        </section>
+
+        <!-- Project 4: Studio -->
+        <section id="slide-12">
+            <div class="content">
+                <span class="tag net">.NET</span> <span class="tag">UI/UX</span>
+                <h2>Project 4: EntglDb Studio</h2>
+                <div class="project-card">
+                    <p><strong>Goal:</strong> Build a GUI Management Tool for cluster administration.</p>
+                    <p style="text-align: left; margin-top: 1rem;"><strong>Tech Stack:</strong> .NET 8, AvaloniaUI
+                        (Recommended).</p>
+                    <ul style="justify-content: flex-start;">
+                        <li><strong>Cluster Visualization</strong> (Topological graph)</li>
+                        <li><strong>Data Explorer</strong> (JSON Editor, CRUD)</li>
+                        <li>Node Management & Remote Configuration</li>
+                        <li>Oplog Inspector</li>
+                    </ul>
+                </div>
+            </div>
+            <span class="slide-number">12</span>
+        </section>
+
+        <!-- Project 5: Conflict Resolution -->
+        <section id="slide-13">
+            <div class="content">
+                <span class="tag net">.NET</span> <span class="tag">Algo</span>
+                <h2>Project 5: Advanced Conflict Resolution</h2>
+                <div class="project-card">
+                    <p><strong>Goal:</strong> Move beyond "Last-Write-Wins" using Smart Merging.</p>
+                    <p style="text-align: left; margin-top: 1rem;"><strong>Core Concept:</strong> JSON Diff/Patch (RFC
+                        6902).</p>
+                    <ul style="justify-content: flex-start;">
+                        <li>Calculate Delta between document versions</li>
+                        <li><strong>Auto-Merge</strong> non-conflicting fields</li>
+                        <li>Define strategies for array merging</li>
+                        <li>Integrate with EntglDb Core pipeline</li>
+                    </ul>
+                </div>
+            </div>
+            <span class="slide-number">13</span>
+        </section>
+
+        <!-- Project 6: Rust -->
+        <section id="slide-14">
+            <div class="content">
+                <span class="tag rust">Rust</span>
+                <h2>Project 6: EntglDb.Rust</h2>
+                <div class="project-card">
+                    <p><strong>Goal:</strong> Safe and performant implementation for embedded/server use.</p>
+                    <p style="text-align: left; margin-top: 1rem;"><strong>Tech Stack:</strong> Rust, Tokio, Serde,
+                        Rusqlite.</p>
+                    <ul style="justify-content: flex-start;">
+                        <li>Memory-safe Core implementation</li>
+                        <li><strong>Tokio</strong> Async Runtime for Networking</li>
+                        <li>Protobuf / Serde Serialization</li>
+                        <li>High-concurrency support</li>
+                    </ul>
+                </div>
+            </div>
+            <span class="slide-number">14</span>
+        </section>
+
+        <!-- Project 7: Go -->
+        <section id="slide-15">
+            <div class="content">
+                <span class="tag go">Go</span>
+                <h2>Project 7: EntglDb.Go</h2>
+                <div class="project-card">
+                    <p><strong>Goal:</strong> Cloud-native implementation for Microservices.</p>
+                    <p style="text-align: left; margin-top: 1rem;"><strong>Focus:</strong> Concurrency, Kubernetes
+                        Sidecars.</p>
+                    <ul style="justify-content: flex-start;">
+                        <li>Goroutine-based Connection handling</li>
+                        <li><strong>Go-SQLite3</strong> Persistence</li>
+                        <li>CLI Tool for node management</li>
+                        <li>Docker optimized build</li>
+                    </ul>
+                </div>
+            </div>
+            <span class="slide-number">15</span>
+        </section>
+
+        <!-- Final Slide -->
+        <section id="slide-16">
+            <div class="shape shape-1" style="bottom: -100px; top: auto; left: 50%;"></div>
+            <div class="content">
+                <h2>Ready to Start?</h2>
+                <p>Detailed specifications are available in the <code>projects/</code> directory.</p>
+                <div style="margin-top: 3rem; opacity: 0.7;">
+                    <small>EntglDb &copy; 2026</small>
+                </div>
+            </div>
+            <span class="slide-number">16</span>
+        </section>
+
+    </div>
+
+    <script>
+        // Generate Navigation Dots
+        const slides = document.querySelectorAll('section');
+        const dotsContainer = document.getElementById('navDots');
+        const container = document.getElementById('slidesContainer');
+
+        slides.forEach((slide, index) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            dot.title = `Slide ${index + 1}`;
+            if (index === 0) dot.classList.add('active');
+            dot.onclick = () => {
+                slide.scrollIntoView({ behavior: 'smooth' });
+            };
+            dotsContainer.appendChild(dot);
+        });
+
+        // Update Active Dot on Scroll
+        container.addEventListener('scroll', () => {
+            const scrollPos = container.scrollTop;
+            const height = window.innerHeight;
+            const index = Math.round(scrollPos / height);
+
+            document.querySelectorAll('.dot').forEach((d, i) => {
+                d.classList.toggle('active', i === index);
+            });
+        });
+    </script>
+</body>
+
+</html>
