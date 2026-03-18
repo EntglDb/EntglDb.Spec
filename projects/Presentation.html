@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -485,65 +485,65 @@
                 <h1>Project Proposals</h1>
                 <p style="font-size:1.5rem; color: var(--text-light);">EntglDb &amp; BLite — Open Source Projects</p>
                 <div class="divider"></div>
-                <p>7 progetti per studenti di Informatica e Ingegneria del Software</p>
+                <p>7 projects for Computer Science and Software Engineering students</p>
             </div>
-            <span class="slide-number">01 / 15</span>
+            <span class="slide-number">01 / 16</span>
         </section>
 
-        <!-- SLIDE 2: CHI SONO -->
+        <!-- SLIDE 2: WHO I AM -->
         <section id="slide-2">
             <div class="shape shape-3"></div>
             <div class="content">
-                <h3>Il Relatore</h3>
-                <h2>Chi sono</h2>
+                <h3>The Presenter</h3>
+                <h2>Who I am</h2>
                 <div class="divider"></div>
                 <div class="bio-card">
                     <div class="bio-avatar">LF</div>
                     <div class="bio-info">
                         <h4>Luca Fabbri</h4>
                         <div class="bio-role">Tech Leader · Zucchetti Hospitality Srl</div>
-                        <p>Laureato in Ingegneria Informatica (laurea breve) presso l'Alma Mater Studiorum di Bologna, 2010.</p>
-                        <p>Lavoro per Zucchetti Hospitality Srl come Tech Leader, seguendo team di sviluppatori per la creazione di soluzioni embedded per il mondo della ristorazione.</p>
-                        <p>Autore e maintainer di <strong>EntglDb</strong> e <strong>BLite</strong>.</p>
+                        <p>B.Sc. in Computer Engineering from Alma Mater Studiorum, University of Bologna, 2010.</p>
+                        <p>I work at Zucchetti Hospitality Srl as Tech Leader, guiding developer teams in building embedded solutions for the hospitality industry.</p>
+                        <p>Author and maintainer of <strong>EntglDb</strong> and <strong>BLite</strong>.</p>
                     </div>
                 </div>
             </div>
-            <span class="slide-number">02 / 15</span>
+            <span class="slide-number">02 / 16</span>
         </section>
 
-        <!-- SLIDE 3: ENTGLDB COS'E -->
+        <!-- SLIDE 3: WHAT IS ENTGLDB -->
         <section id="slide-3">
             <div class="content">
-                <h3>Progetto 1 di 2</h3>
+                <h3>Project 1 of 2</h3>
                 <h2>EntglDb</h2>
                 <div class="divider"></div>
-                <p>Middleware di sincronizzazione P2P per applicazioni offline-first. Protocollo v5, disponibile per .NET 8/10.</p>
+                <p>P2P synchronization middleware for offline-first applications. Protocol v5, available for .NET 8/10.</p>
                 <div class="grid-2">
                     <div class="card">
                         <h4>Offline-First</h4>
-                        <p>L'app funziona senza connessione. I dati si sincronizzano automaticamente quando i peer tornano online.</p>
+                        <p>The app works without a connection. Data syncs automatically when peers come back online.</p>
                     </div>
                     <div class="card">
                         <h4>Peer-to-Peer</h4>
-                        <p>Comunicazione diretta tra dispositivi via TCP. Discovery UDP locale. Nessun cloud obbligatorio.</p>
+                        <p>Direct device-to-device communication over TCP. Local UDP discovery. No cloud required.</p>
                     </div>
                     <div class="card">
                         <h4>Conflict Resolution</h4>
-                        <p>LWW (Last-Write-Wins) e RecursiveMerge per fusione automatica di documenti JSON concorrenti.</p>
+                        <p>LWW (Last-Write-Wins) and RecursiveMerge for automatic merging of concurrent JSON documents.</p>
                     </div>
                     <div class="card">
-                        <h4>Sicurezza</h4>
-                        <p>Handshake ECDH + AES-256, OAuth2 JWT per Cloud Node, Brotli compression.</p>
+                        <h4>Security</h4>
+                        <p>ECDH handshake + AES-256, OAuth2 JWT for Cloud Node, Brotli compression.</p>
                     </div>
                 </div>
             </div>
-            <span class="slide-number">03 / 15</span>
+            <span class="slide-number">03 / 16</span>
         </section>
 
         <!-- SLIDE 4: ENTGLDB SYNC FLOW -->
         <section id="slide-4">
             <div class="content">
-                <h3>EntglDb — Come funziona la sincronizzazione</h3>
+                <h3>EntglDb — How synchronization works</h3>
                 <h2>Sync Flow</h2>
                 <div class="divider"></div>
                 <div class="sync-seq">
@@ -555,7 +555,7 @@
                         <span class="ss-num">1</span>
                         <div class="ss-content">
                             <strong>Handshake</strong>
-                            <span>VectorClock + lista collezioni di interesse</span>
+                            <span>VectorClock + list of collections of interest</span>
                         </div>
                         <span class="ss-dir">→</span>
                     </div>
@@ -571,7 +571,7 @@
                         <span class="ss-num">3</span>
                         <div class="ss-content">
                             <strong>PullChangesRequest</strong>
-                            <span>da quando · filtro collezioni</span>
+                            <span>since when · collection filter</span>
                         </div>
                         <span class="ss-dir">→</span>
                     </div>
@@ -579,7 +579,7 @@
                         <span class="ss-dir">←</span>
                         <div class="ss-content">
                             <strong>OplogEntry stream</strong>
-                            <span>modifiche hash-chained · timestamp HLC</span>
+                            <span>hash-chained changes · HLC timestamp</span>
                         </div>
                         <span class="ss-num">4</span>
                     </div>
@@ -587,7 +587,7 @@
                         <span class="ss-num">5</span>
                         <div class="ss-content">
                             <strong>AckResponse</strong>
-                            <span>conferma ricezione · snapshot richiesto?</span>
+                            <span>receipt confirmation · snapshot requested?</span>
                         </div>
                         <span class="ss-dir">→</span>
                     </div>
@@ -595,72 +595,72 @@
                         <span class="ss-dir">←</span>
                         <div class="ss-content">
                             <strong>SnapshotChunks</strong>
-                            <span>solo se snapshot_required = true (primo avvio)</span>
+                            <span>only if snapshot_required = true (first run)</span>
                         </div>
                         <span class="ss-num">6</span>
                     </div>
                     <div class="ss-msg local">
                         <span class="ss-num">⚡</span>
-                        <span class="ss-local-text">Conflict Resolution locale — LWW / RecursiveMerge · Leader Election (Bully)</span>
+                        <span class="ss-local-text">Local Conflict Resolution — LWW / RecursiveMerge · Leader Election (Bully)</span>
                     </div>
                 </div>
             </div>
-            <span class="slide-number">04 / 15</span>
+            <span class="slide-number">04 / 16</span>
         </section>
 
-        <!-- SLIDE 5: BLITE COS'E -->
+        <!-- SLIDE 5: WHAT IS BLITE -->
         <section id="slide-5">
             <div class="shape shape-2"></div>
             <div class="content">
-                <h3>Progetto 2 di 2</h3>
+                <h3>Project 2 of 2</h3>
                 <h2>BLite</h2>
                 <div class="divider"></div>
-                <p>Database BSON embedded, zero-dipendenze. Targets: <code>net10.0</code> + <code>netstandard2.1</code>. Compatibile con MAUI, Xamarin, Unity.</p>
+                <p>Embedded BSON database, zero dependencies. Targets: <code>net10.0</code> + <code>netstandard2.1</code>. Compatible with MAUI, Xamarin, Unity.</p>
                 <div class="grid-3">
                     <div class="card">
                         <h4>Zero Allocation</h4>
-                        <p>Parsing BSON con <code>Span&lt;T&gt;</code> stack-only. Zero garbage nelle query hot path.</p>
+                        <p>BSON parsing with <code>Span&lt;T&gt;</code> stack-only. Zero garbage on query hot path.</p>
                     </div>
                     <div class="card">
                         <h4>LINQ Provider</h4>
-                        <p>B-Tree indexes. Query con predicati C# compilati. BLQL per query da stringa.</p>
+                        <p>B-Tree indexes. Queries with compiled C# predicates. BLQL for string-based queries.</p>
                     </div>
                     <div class="card">
                         <h4>Vector Search</h4>
-                        <p>HNSW graph (cosine/euclidean). R-Tree geospatiale. CDC per change streaming.</p>
+                        <p>HNSW graph (cosine/euclidean). Geospatial R-Tree. CDC for change streaming.</p>
                     </div>
                 </div>
             </div>
-            <span class="slide-number">05 / 15</span>
+            <span class="slide-number">05 / 16</span>
         </section>
 
         <!-- SLIDE 6: BLITE FEATURES -->
         <section id="slide-6">
             <div class="content">
                 <h3>BLite — Features</h3>
-                <h2>Embedded &amp; Potente</h2>
+                <h2>Embedded &amp; Powerful</h2>
                 <div class="divider"></div>
                 <div class="feat-list">
                     <div class="feat-item"><strong>BSON Engine</strong><span>Span&lt;T&gt; zero-copy read/write</span></div>
-                    <div class="feat-item"><strong>B-Tree Index</strong><span>LINQ predicati + BLQL language</span></div>
-                    <div class="feat-item"><strong>WAL + ACID</strong><span>Transazioni durables + recovery</span></div>
+                    <div class="feat-item"><strong>B-Tree Index</strong><span>LINQ predicates + BLQL language</span></div>
+                    <div class="feat-item"><strong>WAL + ACID</strong><span>Durable transactions + recovery</span></div>
                     <div class="feat-item"><strong>HNSW v3.6.2</strong><span>Vector Search (cosine/euclidean)</span></div>
                     <div class="feat-item"><strong>R-Tree</strong><span>Geospatial queries (lat/lon bbox)</span></div>
                     <div class="feat-item"><strong>CDC</strong><span>Change Data Capture streaming</span></div>
-                    <div class="feat-item"><strong>MAUI/Xamarin</strong><span>Mobile + Desktop nativo</span></div>
+                    <div class="feat-item"><strong>MAUI/Xamarin</strong><span>Native Mobile + Desktop</span></div>
                     <div class="feat-item"><strong>Unity Ready</strong><span>netstandard2.1 compatible</span></div>
-                    <div class="feat-item"><strong>Zero deps</strong><span>Nessuna dipendenza esterna</span></div>
+                    <div class="feat-item"><strong>Zero deps</strong><span>No external dependencies</span></div>
                 </div>
             </div>
-            <span class="slide-number">06 / 15</span>
+            <span class="slide-number">06 / 16</span>
         </section>
 
-        <!-- SLIDE 7: PANORAMICA PROGETTI -->
+        <!-- SLIDE 7: PROJECT OVERVIEW -->
         <section id="slide-7">
             <div class="shape shape-1"></div>
             <div class="content">
-                <h3>7 Proposte di Progetto</h3>
-                <h2>Panoramica</h2>
+                <h3>7 Project Proposals</h3>
+                <h2>Overview</h2>
                 <div class="divider"></div>
                 <div class="project-index">
                     <div class="project-index-item">
@@ -673,7 +673,7 @@
                     </div>
                     <div class="project-index-item">
                         <span class="pnum">03</span>
-                        <span class="ptitle">EntglDb · App Applicativo <span class="tag entgl">.NET</span></span>
+                        <span class="ptitle">EntglDb · Sample Application <span class="tag entgl">.NET</span></span>
                     </div>
                     <div class="project-index-item">
                         <span class="pnum">04</span>
@@ -693,176 +693,217 @@
                     </div>
                 </div>
             </div>
-            <span class="slide-number">07 / 15</span>
+            <span class="slide-number">07 / 16</span>
         </section>
 
-        <!-- SLIDE 8: PROGETTO 1 KOTLIN PORTING -->
+        <!-- SLIDE 8: PROJECT 1 KOTLIN PORTING -->
         <section id="slide-8">
             <div class="content">
                 <span class="tag kotlin">Kotlin / Android</span> <span class="tag entgl">EntglDb</span>
-                <h2 style="margin-top:0.75rem">Progetto 1 — Kotlin Porting</h2>
+                <h2 style="margin-top:0.75rem">Project 1 — Kotlin Porting</h2>
                 <div class="divider"></div>
                 <div class="project-card">
-                    <p><strong>Goal:</strong> Implementare <code>EntglDb.Kotlin</code> da zero, partendo da uno scaffold Gradle già strutturato. Riferimento: <code>EntglDb.Net</code> v1.0.0.</p>
-                    <p style="margin-top:0.75rem"><strong>Moduli:</strong></p>
+                    <p><strong>Goal:</strong> Implement <code>EntglDb.Kotlin</code> from scratch, starting from an already-structured Gradle scaffold. Reference: <code>EntglDb.Net</code> v1.0.0.</p>
+                    <p style="margin-top:0.75rem"><strong>Modules:</strong></p>
                     <ul>
                         <li><strong>:core</strong> — VectorClock, HLC, OplogEntry, Conflict Resolution</li>
                         <li><strong>:persistence-sqlite</strong> — Room / SQLiteDatabase adapter</li>
                         <li><strong>:network</strong> — TCP Client/Server, UDP Discovery, Handshake (proto v5)</li>
-                        <li><strong>:protocol</strong> — Protobuf deserialization (già generato)</li>
-                        <li><strong>:app</strong> — Demo Android (offline-first TODO list)</li>
+                        <li><strong>:protocol</strong> — Protobuf deserialization (already generated)</li>
+                        <li><strong>:app</strong> — Android demo (offline-first TODO list)</li>
                     </ul>
                     <p style="margin-top:0.75rem; font-size:0.95rem; color:var(--text-dim)">Stack: Kotlin 2.x · JDK 21 · Android API 24+ · Gradle 8 · Protobuf v5</p>
                 </div>
             </div>
-            <span class="slide-number">08 / 15</span>
+            <span class="slide-number">08 / 16</span>
         </section>
 
-        <!-- SLIDE 9: PROGETTO 2 CONFLICT RESOLUTION -->
+        <!-- SLIDE 9: PROJECT 2 CONFLICT RESOLUTION -->
         <section id="slide-9">
             <div class="content">
                 <span class="tag entgl">.NET 8/10</span> <span class="tag net">Algorithm</span>
-                <h2 style="margin-top:0.75rem">Progetto 2 — Conflict Resolution</h2>
+                <h2 style="margin-top:0.75rem">Project 2 — Conflict Resolution</h2>
                 <div class="divider"></div>
                 <div class="project-card">
-                    <p><strong>Goal:</strong> Estendere il sistema di conflict resolution di <code>EntglDb.Net</code> con un motore di merge tre-vie basato su JSON Diff/Patch (RFC 6902).</p>
-                    <p style="margin-top:0.75rem"><strong>Attività:</strong></p>
+                    <p><strong>Goal:</strong> Extend the conflict resolution system of <code>EntglDb.Net</code> with a three-way merge engine based on JSON Diff/Patch (RFC 6902).</p>
+                    <p style="margin-top:0.75rem"><strong>Tasks:</strong></p>
                     <ul>
-                        <li>Implementare <code>IDocumentMerger</code> con strategia 3-way merge</li>
+                        <li>Implement <code>IDocumentMerger</code> with 3-way merge strategy</li>
                         <li>Delta computation (JSON Patch ops: add, remove, replace, move)</li>
-                        <li>Merge automatico di campi non-conflittuali</li>
-                        <li>Strategie per array: union, last-write, custom comparator</li>
+                        <li>Automatic merge of non-conflicting fields</li>
+                        <li>Array strategies: union, last-write, custom comparator</li>
                         <li>Test suite + NuGet package <code>EntglDb.ConflictResolution</code></li>
                     </ul>
                     <p style="margin-top:0.75rem; font-size:0.95rem; color:var(--text-dim)">Stack: C# 13 · .NET 8/10 · xUnit · NuGet packaging</p>
                 </div>
             </div>
-            <span class="slide-number">09 / 15</span>
+            <span class="slide-number">09 / 16</span>
         </section>
 
-        <!-- SLIDE 10: PROGETTO 3 APP APPLICATIVO -->
+        <!-- SLIDE 10: PROJECT 3 SAMPLE APPLICATION -->
         <section id="slide-10">
             <div class="content">
                 <span class="tag entgl">EntglDb</span> <span class="tag mobile">App</span>
-                <h2 style="margin-top:0.75rem">Progetto 3 — App Applicativo</h2>
+                <h2 style="margin-top:0.75rem">Project 3 — Sample Application</h2>
                 <div class="divider"></div>
-                <p>Sviluppare un'applicazione reale (mobile o desktop) che dimostri le capacità offline-first di EntglDb.Net.</p>
+                <p>Build a real application (mobile or desktop) that showcases the offline-first capabilities of EntglDb.Net.</p>
                 <div class="grid-2" style="margin-top:1rem">
                     <div class="card">
-                        <h4>Lista della spesa condivisa</h4>
-                        <p>Più utenti modificano la stessa lista offline. Merge automatico all'incontro.</p>
+                        <h4>Shared shopping list</h4>
+                        <p>Multiple users edit the same list offline. Automatic merge when they meet.</p>
                     </div>
                     <div class="card">
-                        <h4>Registro presenze</h4>
-                        <p>Docenti registrano presenze in aula offline. Sync centralizzato via Cloud Node.</p>
+                        <h4>Attendance register</h4>
+                        <p>Teachers record classroom attendance offline. Centralized sync via Cloud Node.</p>
                     </div>
                     <div class="card">
-                        <h4>Inventario magazzino</h4>
-                        <p>Operatori in zone senza rete aggiornano stock. Riconciliazione al rientro.</p>
+                        <h4>Warehouse inventory</h4>
+                        <p>Operators in offline areas update stock. Reconciliation upon return.</p>
                     </div>
                     <div class="card">
-                        <h4>Ispezioni sul campo</h4>
-                        <p>Tecnici compilano report offline (foto + dati). Upload quando torna il segnale.</p>
+                        <h4>Field inspections</h4>
+                        <p>Technicians fill in offline reports (photos + data). Upload when signal returns.</p>
                     </div>
                 </div>
             </div>
-            <span class="slide-number">10 / 15</span>
+            <span class="slide-number">10 / 16</span>
         </section>
 
-        <!-- SLIDE 11: PROGETTO 4 AUDIT -->
+        <!-- SLIDE 11: PROJECT 4 AUDIT -->
         <section id="slide-11">
             <div class="content">
                 <span class="tag blite">BLite</span> <span class="tag net">Observability</span>
-                <h2 style="margin-top:0.75rem">Progetto 4 — Audit &amp; Monitoring</h2>
+                <h2 style="margin-top:0.75rem">Project 4 — Audit &amp; Monitoring</h2>
                 <div class="divider"></div>
                 <div class="project-card">
-                    <p><strong>Goal:</strong> Aggiungere un layer di audit/observability a BLite con overhead zero quando disabilitato (JIT branch elimination).</p>
-                    <p style="margin-top:0.75rem"><strong>Componenti:</strong></p>
+                    <p><strong>Goal:</strong> Add an audit/observability layer to BLite with zero overhead when disabled (JIT branch elimination).</p>
+                    <p style="margin-top:0.75rem"><strong>Components:</strong></p>
                     <ul>
                         <li><strong>Phase 1</strong> — <code>IBLiteAuditSink</code> (events), <code>BLiteMetrics</code> (Interlocked counters), <code>BLiteAuditOptions</code></li>
                         <li><strong>Phase 2</strong> — <code>BLiteDiagnostics</code> (ActivitySource / OpenTelemetry), slow-query detection</li>
                         <li>Hook points: <code>CommitTransaction</code>, <code>InsertDataCore</code>, <code>Execute&lt;TResult&gt;</code></li>
-                        <li>Sink predefiniti: Console, JSON file, OpenTelemetry OTLP</li>
+                        <li>Built-in sinks: Console, JSON file, OpenTelemetry OTLP</li>
                     </ul>
-                    <p style="margin-top:0.75rem; font-size:0.95rem; color:var(--text-dim)">Spec dettagliata in <code>BLite/AUDIT_IMPLEMENTATION.md</code></p>
+                    <p style="margin-top:0.75rem; font-size:0.95rem; color:var(--text-dim)">Detailed spec in <code>BLite/AUDIT_IMPLEMENTATION.md</code></p>
                 </div>
             </div>
-            <span class="slide-number">11 / 15</span>
+            <span class="slide-number">11 / 16</span>
         </section>
 
-        <!-- SLIDE 12: PROGETTO 5 MOBILE AI -->
+        <!-- SLIDE 12: PROJECT 5 MOBILE AI -->
         <section id="slide-12">
             <div class="content">
                 <span class="tag blite">BLite</span> <span class="tag mobile">MAUI</span> <span class="tag ai">AI</span>
-                <h2 style="margin-top:0.75rem">Progetto 5 — BLite Mobile + AI</h2>
+                <h2 style="margin-top:0.75rem">Project 5 — BLite Mobile + AI</h2>
                 <div class="divider"></div>
                 <div class="project-card">
-                    <p><strong>Goal:</strong> App .NET MAUI con semantic search offline usando BLite HNSW + ML.NET + ONNX.</p>
+                    <p><strong>Goal:</strong> .NET MAUI app with offline semantic search using BLite HNSW + ML.NET + ONNX.</p>
                     <p style="margin-top:0.75rem"><strong>Pipeline:</strong></p>
                     <ul>
-                        <li>Testo → <strong>MiniLM-L6-v2</strong> (ONNX, 384 dim) → float[] embedding</li>
-                        <li>Embedding salvato in BLite con <strong>HNSW index</strong></li>
-                        <li>Query semantica: <em>"trova note simili a …"</em> in &lt; 50 ms</li>
-                        <li>UI MAUI: note manager con ricerca ibrida (keyword + semantica)</li>
+                        <li>Text → <strong>MiniLM-L6-v2</strong> (ONNX, 384 dim) → float[] embedding</li>
+                        <li>Embedding stored in BLite with <strong>HNSW index</strong></li>
+                        <li>Semantic query: <em>"find notes similar to …"</em> in &lt; 50 ms</li>
+                        <li>MAUI UI: note manager with hybrid search (keyword + semantic)</li>
                     </ul>
                     <p style="margin-top:0.75rem; font-size:0.95rem; color:var(--text-dim)">Stack: .NET MAUI · ML.NET 3.x · ONNX Runtime · BLite NuGet · C# 13</p>
                 </div>
             </div>
-            <span class="slide-number">12 / 15</span>
+            <span class="slide-number">12 / 16</span>
         </section>
 
-        <!-- SLIDE 13: PROGETTO 6 RESTAURANT MENU IMPORTER -->
+        <!-- SLIDE 13: PROJECT 6 RESTAURANT MENU IMPORTER -->
         <section id="slide-13">
             <div class="content">
                 <span class="tag ai">AI</span> <span class="tag net">.NET</span>
-                <h2 style="margin-top:0.75rem">Progetto 6 — Restaurant Menu Importer</h2>
+                <h2 style="margin-top:0.75rem">Project 6 — Restaurant Menu Importer</h2>
                 <div class="divider"></div>
                 <div class="project-card">
-                    <p><strong>Goal:</strong> Pipeline AI che estrae dati strutturati da menu di ristoranti (URL, PDF, foto, testo libero) e restituisce JSON normalizzato.</p>
+                    <p><strong>Goal:</strong> AI pipeline that extracts structured data from restaurant menus (URL, PDF, photos, free text) and returns normalized JSON.</p>
                     <p style="margin-top:0.75rem"><strong>Pipeline:</strong></p>
                     <ul>
                         <li><strong>Ingestion</strong> — URL scraping / PDF text extract / OCR (Tesseract)</li>
-                        <li><strong>LLM Extraction</strong> — Ollama (Mistral/LLaMA3) o Azure OpenAI con prompt strutturato</li>
+                        <li><strong>LLM Extraction</strong> — Ollama (Mistral/LLaMA3) or Azure OpenAI with structured prompt</li>
                         <li><strong>Schema output</strong> — <code>{ categories[], items[{ name, price, allergens }] }</code></li>
-                        <li><strong>Validation</strong> — JSON Schema, convalida prezzi e allergeni</li>
-                        <li>UI minima: paste URL → visualizza menu strutturato</li>
+                        <li><strong>Validation</strong> — JSON Schema, price and allergen validation</li>
+                        <li>Minimal UI: paste URL → display structured menu</li>
                     </ul>
-                    <p style="margin-top:0.75rem; font-size:0.95rem; color:var(--text-dim)">Dominio: Zucchetti Hospitality — reale applicabilità industriale</p>
+                    <p style="margin-top:0.75rem; font-size:0.95rem; color:var(--text-dim)">Domain: Zucchetti Hospitality — real industrial applicability</p>
                 </div>
             </div>
-            <span class="slide-number">13 / 15</span>
+            <span class="slide-number">13 / 16</span>
         </section>
 
-        <!-- SLIDE 14: PROGETTO 7 DOCUMENT QA RAG -->
+        <!-- SLIDE 14: PROJECT 7 DOCUMENT QA RAG -->
         <section id="slide-14">
             <div class="content">
                 <span class="tag ai">AI</span> <span class="tag blite">BLite</span>
-                <h2 style="margin-top:0.75rem">Progetto 7 — Document Q&amp;A (RAG)</h2>
+                <h2 style="margin-top:0.75rem">Project 7 — Document Q&amp;A (RAG)</h2>
                 <div class="divider"></div>
                 <div class="project-card">
-                    <p><strong>Goal:</strong> Chatbot locale che risponde a domande su un corpus di documenti usando il pattern RAG (Retrieval-Augmented Generation).</p>
+                    <p><strong>Goal:</strong> Local chatbot that answers questions about a document corpus using the RAG (Retrieval-Augmented Generation) pattern.</p>
                     <p style="margin-top:0.75rem"><strong>Pipeline:</strong></p>
                     <ul>
-                        <li><strong>Chunking</strong> — Divide documenti in chunk da ~500 token con overlap</li>
+                        <li><strong>Chunking</strong> — Split documents into ~500-token chunks with overlap</li>
                         <li><strong>Embedding</strong> — MiniLM-L6-v2 (ONNX) → float[384] per chunk</li>
-                        <li><strong>Index</strong> — BLite HNSW per similarità coseno ultraveloce</li>
-                        <li><strong>Retrieval</strong> — Top-K chunk estratti dalla query utente</li>
-                        <li><strong>Generation</strong> — Ollama (LLaMA3/Phi-3) con contesto iniettato nel prompt</li>
+                        <li><strong>Index</strong> — BLite HNSW for ultra-fast cosine similarity</li>
+                        <li><strong>Retrieval</strong> — Top-K chunks extracted from the user query</li>
+                        <li><strong>Generation</strong> — Ollama (LLaMA3/Phi-3) with context injected into the prompt</li>
                     </ul>
-                    <p style="margin-top:0.75rem; font-size:0.95rem; color:var(--text-dim)">100% offline · nessun cloud · privacy-preserving · C# 13 · .NET 9/10</p>
+                    <p style="margin-top:0.75rem; font-size:0.95rem; color:var(--text-dim)">100% offline · no cloud · privacy-preserving · C# 13 · .NET 9/10</p>
                 </div>
             </div>
-            <span class="slide-number">14 / 15</span>
+            <span class="slide-number">14 / 16</span>
         </section>
 
-        <!-- SLIDE 15: FINAL -->
+        <!-- SLIDE 15: WORKING WITH AI TODAY -->
         <section id="slide-15">
+            <div class="shape shape-3"></div>
+            <div class="content">
+                <h3>Tools &amp; Methodology</h3>
+                <h2>Working with AI today</h2>
+                <div class="divider"></div>
+                <div class="grid-2" style="margin-top:1rem">
+                    <div class="card">
+                        <h4>IDE + Agents</h4>
+                        <p>Integrate AI agents into your workflow with <strong>VS Code + GitHub Copilot</strong> or <strong>Claude Code</strong>. The agent reads the project context in real time and operates directly on the code.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Choose the right agent</h4>
+                        <p>
+                            🧠 <strong>Architect</strong> — Gemini Pro / Claude Opus<br>
+                            🔧 <strong>Implementer</strong> — Claude Sonnet (complex tasks)<br>
+                            🧱 <strong>Brick &amp; Mortar</strong> — Gemini Flash / Claude Haiku
+                        </p>
+                    </div>
+                    <div class="card">
+                        <h4>Critical review</h4>
+                        <p><strong>Always</strong> review the analyses and implementations proposed. AI can appear confident even when wrong: verify the business logic and architectural consistency.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Unit Tests &amp; Edge Cases</h4>
+                        <p>Have the AI generate unit tests with explicit coverage of <strong>edge cases</strong>. This is one of the use cases where AI performs at its best.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Watch out for hallucinations</h4>
+                        <p>Question every non-obvious solution. Main risk: <strong>silently duplicated business logic</strong> and cross-module inconsistencies.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Quality &amp; Modern paradigms</h4>
+                        <p>AI imitates existing projects: most don't use <strong>Clean Architecture</strong> or <strong>DDD</strong>. Actively guide the model towards the correct architectural paradigms.</p>
+                    </div>
+                </div>
+            </div>
+            <span class="slide-number">15 / 16</span>
+        </section>
+
+        <!-- SLIDE 16: FINAL -->
+        <section id="slide-16">
             <div class="shape shape-1" style="bottom:-100px; top:auto; left:50%;"></div>
             <div class="content">
-                <h3>Pronti a partire?</h3>
-                <h2>Repository &amp; Specifiche</h2>
+                <h3>Ready to start?</h3>
+                <h2>Repositories &amp; Specs</h2>
                 <div class="divider"></div>
-                <p>Le specifiche dettagliate di ogni progetto sono nella cartella <code>projects/</code> di questo repository.</p>
+                <p>Detailed specifications for each project are in the <code>projects/</code> folder of this repository.</p>
 
                 <a href="https://github.com/EntglDb" target="_blank" class="github-btn">
                     <svg class="github-icon" viewBox="0 0 24 24">
@@ -882,7 +923,7 @@
                     <small>Luca Fabbri · 2026</small>
                 </div>
             </div>
-            <span class="slide-number">15 / 15</span>
+            <span class="slide-number">16 / 16</span>
         </section>
 
     </div>

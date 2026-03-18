@@ -1,81 +1,81 @@
-# Traccia: Idee di Progetto Applicativo con EntglDb
+# Brief: Sample Application Project Ideas with EntglDb
 
-Questa traccia raccoglie scenari applicativi reali nei quali EntglDb può essere usato
-come middleware di sincronizzazione. I team sono liberi di scegliere la piattaforma
-(Android, Windows, Web, console) e lo stack tecnologico, purché usino EntglDb.Net o
-EntglDb.Kotlin come layer di sync.
-
----
-
-## 📋 Cosa deve fare un progetto applicativo
-
-1. **Definire almeno una collezione sincronizzata** tramite `WatchCollection()`.
-2. **Funzionare offline**: lettura e scrittura devono funzionare senza rete.
-3. **Sincronizzarsi automaticamente** quando due istanze sono sulla stessa LAN.
-4. **Gestire almeno un conflitto** in modo sensato per il dominio applicativo.
-5. Esporre una **UI minimale** che mostri lo stato di sync (badge connesso/offline).
+This brief collects real-world application scenarios in which EntglDb can be used
+as a synchronization middleware. Teams are free to choose the platform
+(Android, Windows, Web, console) and technology stack, as long as they use EntglDb.Net or
+EntglDb.Kotlin as the sync layer.
 
 ---
 
-## 💡 Idee Proposte
+## 📋 What a sample application project must do
 
-### A. Lista della spesa collaborativa
-
-App mobile (Android) per gestire una lista della spesa condivisa tra i membri della famiglia.
-Ogni dispositivo può aggiungere, spuntare o rimuovere articoli.
-La sincronizzazione avviene via LAN (Wi-Fi di casa) senza necessità di un server cloud.
-
-**Collezioni:** `shopping_items`
-**Conflitto tipico:** un articolo spuntato su un dispositivo e modificato su un altro.
-**Strategia suggerita:** merge ricorsivo + "spuntato" vince.
+1. **Define at least one synchronized collection** via `WatchCollection()`.
+2. **Work offline**: reads and writes must work without a network connection.
+3. **Synchronize automatically** when two instances are on the same LAN.
+4. **Handle at least one conflict** in a way that makes sense for the application domain.
+5. Expose a **minimal UI** that shows the sync status (connected/offline badge).
 
 ---
 
-### B. Registro presenze offline-first
+## 💡 Proposed Ideas
 
-Applicazione desktop/tablet per registrare le presenze in un ufficio o in un evento.
-Un operatore per sala registra i presenti; i dati si sincronizzano tra tutti i tablet
-al termine della giornata (anche tramite hotspot locale senza internet).
+### A. Collaborative shopping list
 
-**Collezioni:** `attendees`, `check_ins`
-**Conflitto tipico:** stessa persona registrata da due operatori diversi.
-**Strategia suggerita:** merge per `check_in_time` più recente (HLC).
+Mobile app (Android) to manage a shared shopping list among family members.
+Each device can add, tick, or remove items.
+Synchronization happens over LAN (home Wi-Fi) without needing a cloud server.
 
----
-
-### C. Inventario di magazzino multi-postazione
-
-Sistema per piccoli magazzini con più postazioni di lavoro.
-Ogni postazione (Windows / Android tablet) può inserire movimenti di carico/scarico.
-La sincronizzazione avviene via LAN; non è richiesta connessione internet.
-
-**Collezioni:** `products`, `movements`
-**Conflitto tipico:** due operatori modificano lo stesso prodotto contemporaneamente.
-**Strategia suggerita:** append dei movimenti (immutable log), ricalcolo stock in lettura.
+**Collections:** `shopping_items`
+**Typical conflict:** an item ticked on one device and modified on another.
+**Suggested strategy:** recursive merge + "ticked" wins.
 
 ---
 
-### D. Note di campo per ispezioni
+### B. Offline-first attendance register
 
-App mobile per tecnici che effettuano ispezioni sul campo (es. impianti, negozi).
-Le note vengono scritte offline; si sincronizzano quando il tecnico rientra in ufficio
-e si collega alla LAN aziendale.
+Desktop/tablet application to record attendance at an office or event.
+One operator per room records those present; data syncs between all tablets
+at the end of the day (even via a local hotspot without internet).
 
-**Collezioni:** `inspections`, `photos_metadata`
-**Conflitto tipico:** supervisore modifica una nota mentre il tecnico la aggiorna.
-**Strategia suggerita:** sezioni separate del documento (conflitti rarissimi); in caso, merge manuale con dialog UI.
+**Collections:** `attendees`, `check_ins`
+**Typical conflict:** the same person registered by two different operators.
+**Suggested strategy:** merge on the most recent `check_in_time` (HLC).
 
 ---
 
-## 📦 Output Atteso (per qualsiasi idea scelta)
+### C. Multi-workstation warehouse inventory
 
-- Applicazione funzionante con almeno 2 istanze sincronizzabili sulla stessa LAN
-- Codice sorgente con README che spiega come avviare le istanze
-- Dimostrazione di almeno un caso di conflitto e della sua risoluzione
-- Test di integrazione con due `PeerDatabase` in-process
+System for small warehouses with multiple workstations.
+Each workstation (Windows / Android tablet) can enter stock in/out movements.
+Synchronization happens over LAN; no internet connection required.
 
-## 📚 Riferimenti
+**Collections:** `products`, `movements`
+**Typical conflict:** two operators modify the same product simultaneously.
+**Suggested strategy:** append movements (immutable log), recalculate stock on read.
 
-- `EntglDb.Net/README.md` — Quick Start e Integration Guide
-- `EntglDb.Net/samples/` — esempi ufficiali
-- `EntglDb.Kotlin/README.md` — scaffold Android
+---
+
+### D. Field inspection notes
+
+Mobile app for technicians performing field inspections (e.g., facilities, stores).
+Notes are written offline; they sync when the technician returns to the office
+and connects to the company LAN.
+
+**Collections:** `inspections`, `photos_metadata`
+**Typical conflict:** supervisor modifies a note while the technician is updating it.
+**Suggested strategy:** separate document sections (conflicts very rare); if they occur, manual merge with a UI dialog.
+
+---
+
+## 📦 Expected Output (for any chosen idea)
+
+- Working application with at least 2 instances synchronizable on the same LAN
+- Source code with a README explaining how to start the instances
+- Demonstration of at least one conflict case and its resolution
+- Integration test with two in-process `PeerDatabase` instances
+
+## 📚 References
+
+- `EntglDb.Net/README.md` — Quick Start and Integration Guide
+- `EntglDb.Net/samples/` — official examples
+- `EntglDb.Kotlin/README.md` — Android scaffold

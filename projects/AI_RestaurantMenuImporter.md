@@ -1,36 +1,36 @@
-# Progetto AI: Restaurant Menu Importer
+﻿# AI Project: Restaurant Menu Importer
 
-## 🎯 Obiettivo
+## 🎯 Goal
 
-Sviluppare un'applicazione che legge il menu di un ristorante da una **pagina web** o
-da **testo libero** (incollato dall'utente), lo analizza con un modello AI e produce
-un **JSON strutturato** con le portate, le categorie, i prezzi e le descrizioni.
+Develop an application that reads a restaurant menu from a **web page** or from
+**free text** (pasted by the user), analyses it with an AI model, and produces
+a **structured JSON** with the dishes, categories, prices, and descriptions.
 
-Progetto **platform-free**: il team può scegliere la piattaforma preferita
-(web app, console, app desktop, mobile). La libreria AI/ML da usare è libera.
-
----
-
-## 🧠 Problema da risolvere
-
-I menu dei ristoranti in rete esistono in centinaia di formati diversi: pagine HTML
-disomogenee, PDF scannerizzati, post Instagram, file Word. Aggregatori come TheFork
-o Google Maps devono "estrarre" struttura da testo non strutturato.
-
-Questo progetto è un **estrattore intelligente**: dato un menu in qualsiasi formato testuale,
-produce un JSON canonico e usabile da qualsiasi sistema gestionale.
+**Platform-free** project: the team can choose the preferred platform
+(web app, console, desktop, mobile). The AI/ML library is also free to choose.
 
 ---
 
-## 🛠️ Specifiche Tecniche
+## 🧠 Problem to solve
 
-### Input accettati
+Restaurant menus on the web exist in hundreds of different formats: non-uniform HTML
+pages, scanned PDFs, Instagram posts, Word files. Aggregators such as TheFork
+or Google Maps must "extract" structure from unstructured text.
 
-- URL di una pagina web con il menu del ristorante (scraping + estrazione testo)
-- Testo libero incollato dall'utente (copia-incolla da PDF o Word)
-- File `.txt` o `.md`
+This project is an **intelligent extractor**: given a menu in any text format,
+it produces a canonical, usable JSON for any management system.
 
-### Output JSON atteso
+---
+
+## 🛠️ Technical Specifications
+
+### Accepted inputs
+
+- URL of a web page containing the restaurant menu (scraping + text extraction)
+- Free text pasted by the user (copy-paste from PDF or Word)
+- `.txt` or `.md` files
+
+### Expected JSON output
 
 ```json
 {
@@ -38,11 +38,11 @@ produce un JSON canonico e usabile da qualsiasi sistema gestionale.
   "currency": "EUR",
   "categories": [
     {
-      "name": "Antipasti",
+      "name": "Starters",
       "items": [
         {
           "name": "Bruschetta al pomodoro",
-          "description": "Pane tostato con pomodoro fresco e basilico",
+          "description": "Toasted bread with fresh tomato and basil",
           "price": 6.50,
           "allergens": ["gluten"],
           "tags": ["vegetarian"]
@@ -50,86 +50,86 @@ produce un JSON canonico e usabile da qualsiasi sistema gestionale.
       ]
     },
     {
-      "name": "Primi Piatti",
+      "name": "First Courses",
       "items": [ ... ]
     }
   ]
 }
 ```
 
-### Pipeline di elaborazione
+### Processing pipeline
 
 ```
-URL / Testo
+URL / Text
     │
     ▼
 ┌─────────────────────────┐
-│  Fetch & Clean          │  HTTP GET + strip HTML tags (se URL)
-│                         │  Oppure accetta testo grezzo
+│  Fetch & Clean          │  HTTP GET + strip HTML tags (if URL)
+│                         │  Or accepts raw text
 └─────────────────────────┘
     │
     ▼
 ┌─────────────────────────┐
-│  AI Extraction          │  Prompt a un LLM via API (OpenAI / Ollama locale)
-│                         │  oppure modello NER locale (Hugging Face / ML.NET)
-│  Prompt suggerito:      │
-│  "Estrai il menu dal    │
-│  testo seguente e       │
-│  restituisci JSON nel   │
-│  formato [schema]..."   │
+│  AI Extraction          │  Prompt to an LLM via API (OpenAI / local Ollama)
+│                         │  or local NER model (Hugging Face / ML.NET)
+│  Suggested prompt:      │
+│  "Extract the menu from │
+│  the following text and │
+│  return JSON in the     │
+│  format [schema]..."    │
 └─────────────────────────┘
     │
     ▼
 ┌─────────────────────────┐
-│  Validation & Cleanup   │  Valida il JSON, normalizza prezzi (virgola → punto)
-│                         │  Deduplicazione categorie, trim testi
+│  Validation & Cleanup   │  Validate JSON, normalise prices (comma → dot)
+│                         │  Category deduplication, text trimming
 └─────────────────────────┘
     │
     ▼
 ┌─────────────────────────┐
-│  Output                 │  JSON su file / clipboard / API response
+│  Output                 │  JSON to file / clipboard / API response
 └─────────────────────────┘
 ```
 
-### Integrazione AI — opzioni
+### AI integration — options
 
-Il team sceglie una delle seguenti:
+The team chooses one of the following:
 
-| Opzione | Costo | Offline |
+| Option | Cost | Offline |
 |---|---|---|
 | OpenAI API (`gpt-4o-mini`) | ~$0.001/menu | No |
-| Ollama locale (`llama3.2:3b`) | Gratis | Sì |
+| Local Ollama (`llama3.2:3b`) | Free | Yes |
 | HuggingFace Inference API | Free tier | No |
-| ML.NET + modello ONNX custom | Gratis | Sì |
+| ML.NET + custom ONNX model | Free | Yes |
 
-La scelta va documentata nel README con motivazione.
+The choice must be documented in the README with justification.
 
-### Requisiti minimi
+### Minimum requirements
 
-1. Funziona con almeno 5 menu di ristoranti reali diversi (da allegare come test cases)
-2. Produce JSON valido e conforme allo schema in ogni caso
-3. Gestisce testi in **italiano** e **inglese**
-4. Gestisce la mancanza del prezzo (campo `null`, non errore)
-5. Interfaccia utente minimale (web form, CLI con argomenti, o form desktop)
+1. Works with at least 5 different real restaurant menus (to be included as test cases)
+2. Produces valid JSON conforming to the schema in every case
+3. Handles texts in **Italian** and **English**
+4. Handles missing prices (`null` field, not an error)
+5. Minimal user interface (web form, CLI with arguments, or desktop form)
 
-### Requisiti avanzati (opzionali)
+### Advanced requirements (optional)
 
-- Rilevamento automatico degli **allergeni** (gluten, lactose, nuts, …) dal testo
-- Tag automatici (`vegetarian`, `vegan`, `spicy`)
-- Stima del prezzo quando mancante, basata su portate simili nel menu
-- Export in formato CSV oltre che JSON
+- Automatic **allergen** detection (gluten, lactose, nuts, …) from text
+- Automatic tags (`vegetarian`, `vegan`, `spicy`)
+- Price estimation when missing, based on similar dishes in the menu
+- CSV export in addition to JSON
 
 ---
 
-## 📦 Output Atteso
+## 📦 Expected Output
 
-- Applicazione funzionante nella piattaforma scelta
-- Almeno 5 test cases con menu reali (URL o file testo) e JSON atteso
-- README con: piattaforma scelta, stack AI, istruzioni di esecuzione
-- Valutazione qualitativa dell'accuracy su un set di 10 menu
+- Working application on the chosen platform
+- At least 5 test cases with real menus (URL or text file) and expected JSON
+- README with: chosen platform, AI stack, execution instructions
+- Qualitative accuracy evaluation on a set of 10 menus
 
-## 📚 Riferimenti
+## 📚 References
 
 - OpenAI structured output: https://platform.openai.com/docs/guides/structured-outputs
-- Ollama (LLM locale): https://ollama.com
-- JSON Schema per validazione output
+- Ollama (local LLM): https://ollama.com
+- JSON Schema for output validation

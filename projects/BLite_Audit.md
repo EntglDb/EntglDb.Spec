@@ -1,51 +1,51 @@
-# Progetto: BLite — Audit & Performance Monitoring
+﻿# Project: BLite — Audit & Performance Monitoring
 
-## 🎯 Obiettivo
+## 🎯 Goal
 
-Implementare il sistema di **audit e monitoraggio delle performance** per BLite,
-come descritto nella specifica tecnica dettagliata in `BLite/AUDIT_IMPLEMENTATION.md`.
+Implement the **audit and performance monitoring** system for BLite,
+as described in the detailed technical specification in `BLite/AUDIT_IMPLEMENTATION.md`.
 
-BLite è un database embedded .NET ad alte prestazioni (ACID, BSON, zero-allocation).
-Questo progetto aggiunge visibilità interna al motore: ogni operazione importante
-emette un evento che può essere intercettato dall'applicazione ospite per logging,
-metriche, alert su slow query, e integrazione con OpenTelemetry.
+BLite is a high-performance embedded .NET database (ACID, BSON, zero-allocation).
+This project adds internal visibility to the engine: every important operation
+emits an event that can be intercepted by the host application for logging,
+metrics, slow-query alerts, and OpenTelemetry integration.
 
 ---
 
-## 🧠 Architettura del sistema di Audit
+## 🧠 Audit system architecture
 
-Il sistema si compone di tre elementi ortogonali:
+The system consists of three orthogonal elements:
 
 ```
 ┌───────────────────────────────────────────────────────────────┐
-│  BLiteAuditOptions  (configurata nel costruttore dell'engine) │
-│  ├── IBLiteAuditSink?         (callback utente)               │
-│  ├── BLiteMetrics?            (contatori in-memory)           │
+│  BLiteAuditOptions  (configured in the engine constructor)    │
+│  ├── IBLiteAuditSink?         (user callback)                 │
+│  ├── BLiteMetrics?            (in-memory counters)            │
 │  ├── SlowQueryThreshold       (TimeSpan)                      │
 │  └── EnableDiagnosticSource   (bool — OpenTelemetry)          │
 ├───────────────────────────────────────────────────────────────┤
-│  Punto 1: StorageEngine.CommitTransaction                     │
-│  Punto 2: DocumentCollection.InsertDataCore                   │
-│  Punto 3: BTreeQueryProvider.Execute<TResult>                 │
+│  Hook 1: StorageEngine.CommitTransaction                      │
+│  Hook 2: DocumentCollection.InsertDataCore                    │
+│  Hook 3: BTreeQueryProvider.Execute<TResult>                  │
 └───────────────────────────────────────────────────────────────┘
 ```
 
-**Principio zero-overhead:** tutti gli hook sono protetti da guard. Con opzioni non
-configurate, il JIT elimina i branch (dead-code elimination). Il database è as fast
-as before se l'audit non viene abilitato.
+**Zero-overhead principle:** all hooks are guarded. With unconfigured options,
+the JIT eliminates the branches (dead-code elimination). The database is as fast
+as before if audit is not enabled.
 
 ---
 
-## 🛠️ Specifiche Tecniche
+## 🛠️ Technical Specifications
 
-La specifica dettagliata è in `BLite/AUDIT_IMPLEMENTATION.md`. Di seguito il riassunto
-delle due fasi di implementazione.
+The detailed specification is in `BLite/AUDIT_IMPLEMENTATION.md`. Below is a summary
+of the two implementation phases.
 
-### FASE 1 — Sink + Metriche in-process
+### PHASE 1 — Sink + In-process Metrics
 
-**File da creare** in `src/BLite.Core/Audit/`:
+**Files to create** in `src/BLite.Core/Audit/`:
 
-#### `AuditEvents.cs` — Record types degli eventi
+#### `AuditEvents.cs` — Event record types
 ```csharp
 public readonly record struct CommitAuditEvent(
     ulong TransactionId, string CollectionName,
@@ -60,7 +60,7 @@ public readonly record struct QueryAuditEvent(
     string? IndexName, int ResultCount, TimeSpan Elapsed);
 ```
 
-#### `IBLiteAuditSink.cs` — Interfaccia utente
+#### `IBLiteAuditSink.cs` — User interface
 ```csharp
 public interface IBLiteAuditSink
 {
@@ -71,17 +71,17 @@ public interface IBLiteAuditSink
 }
 ```
 
-#### `BLiteMetrics.cs` — Contatori in-memory (Interlocked)
-Contatori: `TotalInserts`, `TotalQueriesIndexScan`, `TotalQueriesBsonScan`,
+#### `BLiteMetrics.cs` — In-memory counters (Interlocked)
+Counters: `TotalInserts`, `TotalQueriesIndexScan`, `TotalQueriesBsonScan`,
 `TotalQueriesFullScan`, `TotalCommits`, `PageCacheHits`, `PageCacheMisses`.
-Proprietà derivate: `AvgInsertMs`, `AvgQueryMs`, `CacheHitRate`.
+Derived properties: `AvgInsertMs`, `AvgQueryMs`, `CacheHitRate`.
 
-**Punti di hook da modificare:**
-- `StorageEngine.CommitTransaction` → emette `CommitAuditEvent`
-- `DocumentCollection.InsertDataCore` → emette `InsertAuditEvent`
-- `BTreeQueryProvider.Execute<TResult>` → emette `QueryAuditEvent` + propaga `QueryStrategy`
+**Hook points to modify:**
+- `StorageEngine.CommitTransaction` → emits `CommitAuditEvent`
+- `DocumentCollection.InsertDataCore` → emits `InsertAuditEvent`
+- `BTreeQueryProvider.Execute<TResult>` → emits `QueryAuditEvent` + propagates `QueryStrategy`
 
-**Nuovi costruttori pubblici:**
+**New public constructors:**
 ```csharp
 // BLiteEngine
 public BLiteEngine(string path, BLiteAuditOptions auditOptions) { ... }
@@ -92,7 +92,7 @@ protected DocumentDbContext(string path, BLiteAuditOptions auditOptions) { ... }
 
 ---
 
-### FASE 2 — DiagnosticSource / Activity + Slow Query
+### PHASE 2 — DiagnosticSource / Activity + Slow Query
 
 #### `BLiteDiagnostics.cs`
 ```csharp
@@ -103,27 +103,27 @@ public static class BLiteDiagnostics
 }
 ```
 
-- Emissione di `Activity` in `CommitTransaction` e `Execute<TResult>`
-- `SlowOperationEvent` emesso quando `Elapsed > SlowQueryThreshold`
-- Propagazione di `QueryStrategy` e `IndexName` come tag OpenTelemetry
+- Emit `Activity` in `CommitTransaction` and `Execute<TResult>`
+- `SlowOperationEvent` emitted when `Elapsed > SlowQueryThreshold`
+- Propagate `QueryStrategy` and `IndexName` as OpenTelemetry tags
 
 ---
 
-## 📦 Output Atteso
+## 📦 Expected Output
 
-- Implementazione completa di Fase 1 che compila senza errori su `net10.0` e `netstandard2.1`
-- Implementazione di Fase 2 (ActivitySource + slow query detection)
-- Suite di test (`tests/BLite.Tests/Audit/`) con almeno 15 casi:
-  - `IBLiteAuditSink` riceve eventi per insert, query, commit
-  - `BLiteMetrics` contatori corretti dopo operazioni sequenziali e concorrenti
-  - Slow query detection: evento emesso se soglia superata, non emesso se sotto soglia
-  - Zero overhead verificato: performance con `null` options entro margine del 2% vs baseline
-- Demo `BLiteSink` che scrive gli eventi su console (incluso nel progetto di test)
+- Complete Phase 1 implementation that compiles without errors on `net10.0` and `netstandard2.1`
+- Phase 2 implementation (ActivitySource + slow query detection)
+- Test suite (`tests/BLite.Tests/Audit/`) with at least 15 cases:
+  - `IBLiteAuditSink` receives events for insert, query, commit
+  - `BLiteMetrics` counters correct after sequential and concurrent operations
+  - Slow query detection: event emitted if threshold exceeded, not emitted if below threshold
+  - Zero overhead verified: performance with `null` options within 2% margin vs baseline
+- Demo `BLiteSink` that writes events to the console (included in the test project)
 
-## 📚 Riferimenti
+## 📚 References
 
-- `BLite/AUDIT_IMPLEMENTATION.md` — specifica tecnica completa con codice C#
-- `BLite/src/BLite.Core/Storage/StorageEngine.cs` — chokepoint CommitTransaction
-- `BLite/src/BLite.Core/Collections/DocumentCollection.cs` — chokepoint InsertDataCore
-- `BLite/src/BLite.Core/Query/BTreeQueryProvider.cs` — chokepoint Execute
-- `BLite/README.md` — panoramica del progetto
+- `BLite/AUDIT_IMPLEMENTATION.md` — complete technical specification with C# code
+- `BLite/src/BLite.Core/Storage/StorageEngine.cs` — CommitTransaction chokepoint
+- `BLite/src/BLite.Core/Collections/DocumentCollection.cs` — InsertDataCore chokepoint
+- `BLite/src/BLite.Core/Query/BTreeQueryProvider.cs` — Execute chokepoint
+- `BLite/README.md` — project overview

@@ -1,131 +1,131 @@
-# Progetto: BLite Mobile + AI (MAUI / Android + ML.NET)
+﻿# Project: BLite Mobile + AI (MAUI / Android + ML.NET)
 
-## 🎯 Obiettivo
+## 🎯 Goal
 
-Sviluppare un'applicazione mobile **.NET MAUI** (o nativa Android in C#) che utilizza
-**BLite** come database embedded locale e **ML.NET** con un modello AI minimale
-(Mini LLM o modello di classificazione/NLP) per arricchire i dati con intelligenza
-artificiale direttamente sul dispositivo — senza cloud, senza connessione obbligatoria.
+Develop a **.NET MAUI** mobile application (or native Android in C#) that uses
+**BLite** as the local embedded database and **ML.NET** with a minimal AI model
+(Mini LLM or classification/NLP model) to enrich data with artificial intelligence
+directly on the device — without cloud, without a mandatory connection.
 
-BLite è compatibile con `netstandard2.1`, il che lo rende adatto a MAUI e Xamarin
-senza alcuna modifica.
-
----
-
-## 🧠 Scenario di riferimento
-
-**"Smart Notes"** — un'app di note personali che:
-1. Salva le note in BLite (veloce, embedded, ACID, zero dipendenze).
-2. Classifica automaticamente ogni nota con un **tag** (Lavoro, Personale, Idea, Todo, ...)
-   usando un modello ML.NET addestrato on-device.
-3. Genera un **riassunto** o una **lista di parole chiave** con un modello di estrazione
-   NLP minimale (es. TF-IDF, sentence embeddings, o un ONNX model leggero).
-4. Permette di cercare per somiglianza vettoriale usando l'**HNSW Vector Search** di BLite.
-
-Il team è libero di scegliere un dominio applicativo diverso (inventario, spese, ispezioni)
-purché rispetti i vincoli tecnici.
+BLite is compatible with `netstandard2.1`, making it suitable for MAUI and Xamarin
+without any modifications.
 
 ---
 
-## 🛠️ Specifiche Tecniche
+## 🧠 Reference scenario
 
-### Stack tecnologico
+**"Smart Notes"** — a personal notes app that:
+1. Saves notes in BLite (fast, embedded, ACID, zero dependencies).
+2. Automatically classifies each note with a **tag** (Work, Personal, Idea, Todo, ...)
+   using an ML.NET model trained on-device.
+3. Generates a **summary** or a **list of keywords** with a minimal NLP extraction model
+   (e.g. TF-IDF, sentence embeddings, or a lightweight ONNX model).
+4. Allows searching by vector similarity using BLite's **HNSW Vector Search**.
 
-| Componente | Tecnologia |
+The team is free to choose a different application domain (inventory, expenses, inspections)
+as long as it meets the technical constraints.
+
+---
+
+## 🛠️ Technical Specifications
+
+### Technology stack
+
+| Component | Technology |
 |---|---|
-| App | .NET MAUI o Android (Xamarin-compatible) |
-| Database locale | BLite (netstandard2.1) |
+| App | .NET MAUI or Android (Xamarin-compatible) |
+| Local database | BLite (netstandard2.1) |
 | AI / ML | ML.NET + ONNX Runtime |
-| Modello AI | TinyBERT / MiniLM-L6 (ONNX, ~23 MB) oppure modello custom ML.NET |
-| UI | .NET MAUI Shell o Jetpack Compose |
+| AI model | TinyBERT / MiniLM-L6 (ONNX, ~23 MB) or custom ML.NET model |
+| UI | .NET MAUI Shell or Jetpack Compose |
 
-### 1. Integrazione BLite
+### 1. BLite Integration
 
 ```csharp
-// Configurazione database su dispositivo mobile
+// Database setup on mobile device
 var dbPath = Path.Combine(FileSystem.AppDataDirectory, "notes.db");
 using var db = new NotesDbContext(dbPath);
 
-// Operazione CRUD standard
-db.Notes.Insert(new Note { Title = "Riunione", Content = "...", CreatedAt = DateTime.UtcNow });
+// Standard CRUD operation
+db.Notes.Insert(new Note { Title = "Meeting", Content = "...", CreatedAt = DateTime.UtcNow });
 
-// Vector Search per note simili
+// Vector Search for similar notes
 var similar = db.Notes.AsQueryable()
     .VectorSearch(n => n.Embedding, queryVector, k: 5)
     .ToList();
 ```
 
-Il `DbContext` deve usare il costruttore con `BLiteAuditOptions` se il team ha
-anche completato il progetto BLite Audit (opzionale, ma consigliato).
+The `DbContext` should use the constructor with `BLiteAuditOptions` if the team has
+also completed the BLite Audit project (optional, but recommended).
 
-### 2. Pipeline ML.NET
+### 2. ML.NET Pipeline
 
 ```
-Testo della nota
+Note text
       │
       ▼
 ┌──────────────────────┐
-│  Text Featurizer     │  ML.NET: normalizzazione, tokenizzazione
+│  Text Featurizer     │  ML.NET: normalization, tokenization
 └──────────────────────┘
       │
       ▼
 ┌──────────────────────┐
-│  Classification      │  ML.NET multiclass classification (5 categorie)
-│  (FastForest o SDCA) │  → tag automatico
+│  Classification      │  ML.NET multiclass classification (5 categories)
+│  (FastForest or SDCA)│  → automatic tag
 └──────────────────────┘
       │
       ▼
 ┌──────────────────────┐
-│  Sentence Embedding  │  ONNX: MiniLM-L6-v2 oppure custom embeddings
-│  (ONNX Runtime)      │  → vector float[384]
+│  Sentence Embedding  │  ONNX: MiniLM-L6-v2 or custom embeddings
+│  (ONNX Runtime)      │  → float[384] vector
 └──────────────────────┘
       │
       ▼
 ┌──────────────────────┐
-│  BLite Vector Index  │  HNSW salva l'embedding e permette ricerca ANN
+│  BLite Vector Index  │  HNSW stores the embedding and enables ANN search
 │  (n => n.Embedding)  │
 └──────────────────────┘
 ```
 
-### 3. Modello di classificazione (ML.NET)
+### 3. Classification model (ML.NET)
 
-Il team deve:
-1. Preparare un dataset di training (minimo 200 esempi) in formato CSV:
-   `text,label` dove `label` è uno tra `work`, `personal`, `idea`, `todo`, `other`.
-2. Addestrare il modello con ML.NET `MulticlassClassification`.
-3. Esportare e caricare il modello `.zip` come risorsa embedded nell'app.
-4. Classificare ogni nota al momento del salvataggio (pipeline asincrona, non blocca la UI).
+The team must:
+1. Prepare a training dataset (minimum 200 examples) in CSV format:
+   `text,label` where `label` is one of `work`, `personal`, `idea`, `todo`, `other`.
+2. Train the model with ML.NET `MulticlassClassification`.
+3. Export and load the `.zip` model as an embedded resource in the app.
+4. Classify each note at save time (async pipeline, does not block the UI).
 
-### 4. ONNX Embedding (opzionale ma consigliato)
+### 4. ONNX Embedding (optional but recommended)
 
-- Scaricare `all-MiniLM-L6-v2` in formato ONNX da HuggingFace (~23 MB).
-- Integrare tramite `Microsoft.ML.OnnxRuntime` o `Microsoft.ML.OnnxTransformer`.
-- Generare un `float[]` di dimensione 384 per ogni nota.
-- Configurare un `VectorIndex` su BLite e salvare l'embedding.
-- Implementare la ricerca "Note simili a questa" nella UI.
+- Download `all-MiniLM-L6-v2` in ONNX format from HuggingFace (~23 MB).
+- Integrate via `Microsoft.ML.OnnxRuntime` or `Microsoft.ML.OnnxTransformer`.
+- Generate a `float[]` of dimension 384 for each note.
+- Configure a `VectorIndex` on BLite and save the embedding.
+- Implement the "Notes similar to this" search in the UI.
 
-### 5. Funzionalità UI richieste
+### 5. Required UI features
 
-- Lista note con tag colorati (classificati da ML)
-- Editor di nota con salvataggio automatico
-- Barra di ricerca: ricerca full-text + ricerca per similarità vettoriale
-- Schermata debug (facoltativa): mostra metriche BLite (`BLiteMetrics`) se disponibili
+- Note list with coloured tags (classified by ML)
+- Note editor with auto-save
+- Search bar: full-text search + vector similarity search
+- Debug screen (optional): shows BLite metrics (`BLiteMetrics`) if available
 
 ---
 
-## 📦 Output Atteso
+## 📦 Expected Output
 
-- App MAUI compilante su Android (API 24+) o Windows
-- BLite usato come unico storage (no SQLite separato, no file JSON)
-- Modello ML.NET classificazione funzionante con accuracy ≥ 75% sul test set
-- Vector search dimostrabile nell'UI (minimum: bottone "Note simili")
-- README con istruzioni per build e demo
+- MAUI app that compiles on Android (API 24+) or Windows
+- BLite used as the sole storage (no separate SQLite, no JSON files)
+- Working ML.NET classification model with accuracy ≥ 75% on the test set
+- Vector search demonstrable in the UI (minimum: "Similar notes" button)
+- README with build and demo instructions
 
-## 📚 Riferimenti
+## 📚 References
 
 - `BLite/README.md` — Vector Search HNSW, LINQ, CDC
-- `BLite/src/BLite.Core/` — codice sorgente engine
+- `BLite/src/BLite.Core/` — engine source code
 - [ML.NET docs](https://learn.microsoft.com/dotnet/machine-learning/)
-- [ONNX Runtime per .NET](https://onnxruntime.ai/docs/get-started/with-csharp.html)
-- [MiniLM-L6-v2 ONNX su HuggingFace](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
+- [ONNX Runtime for .NET](https://onnxruntime.ai/docs/get-started/with-csharp.html)
+- [MiniLM-L6-v2 ONNX on HuggingFace](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
 - [.NET MAUI Getting Started](https://learn.microsoft.com/dotnet/maui/get-started/first-app)

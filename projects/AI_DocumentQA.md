@@ -1,137 +1,170 @@
-# Progetto AI: Document Q&A — RAG su documenti locali
+﻿# AI Project: Document Q&A — RAG on local documents
 
-## 🎯 Obiettivo
+## 🎯 Goal
 
-Sviluppare un'applicazione **RAG (Retrieval-Augmented Generation)** che permette
-all'utente di caricare un insieme di documenti (PDF, Word, testo) e di interrogarli
-in linguaggio naturale, ottenendo risposte basate **esclusivamente** sul contenuto
-caricato.
+Develop a **RAG (Retrieval-Augmented Generation)** application that lets the user
+load one or more documents (PDF, `.txt`, `.md`) and interrogate them in **natural
+language**, receiving accurate answers with citations to the source passages.
 
-Progetto **platform-free**: il team sceglie la piattaforma preferita (web app,
-console, Blazor, MAUI). Il database vettoriale può essere BLite (con HNSW vector
-search), ma sono accettate anche alternative open source.
+**Platform-free**: the team chooses the preferred platform (console, web, desktop).
 
 ---
 
-## 🧠 Problema da risolvere
+## 🧠 Problem to solve
 
-Le aziende accumulano manuali tecnici, contratti, procedure interne e note di
-riunione che rimangono inaccessibili perché ricercarli con keyword è inefficace.
-Un sistema RAG trasforma documenti passivi in una **knowledge base conversazionale**.
+LLMs have a knowledge cut-off and do not know the contents of _your_ documents.
+RAG solves this by splitting the documents into chunks, converting them to
+**vector embeddings**, and retrieving the most relevant chunks for each question.
+The LLM then answers using _only_ those chunks — avoiding hallucinations and
+providing verifiable citations.
+
+This project uses **BLite** as the vector store (HNSW index built-in).
 
 ---
 
-## 🛠️ Specifiche Tecniche
+## 🛠️ Technical Specifications
 
-### Pipeline RAG
+### Processing pipeline
 
 ```
-FASE 1 — Indicizzazione (run once)
-─────────────────────────────────
-Documento (PDF/Word/txt)
-    │
-    ▼
-┌──────────────────────┐
-│  Chunking            │  Divide il testo in chunk da ~500 token con overlap ~50
-└──────────────────────┘
-    │
-    ▼
-┌──────────────────────┐
-│  Embedding           │  Genera vettore float[] per ogni chunk
-│                      │  (MiniLM-L6-v2 / OpenAI text-embedding-3-small)
-└──────────────────────┘
-    │
-    ▼
-┌──────────────────────┐
-│  Vector Store        │  Salva chunk + embedding + metadata (documento, pagina)
-│  (BLite HNSW o       │
-│   alternativa)       │
-└──────────────────────┘
+PHASE 1 — Indexing (run once per document)
 
-FASE 2 — Ricerca e risposta (per ogni domanda)
-──────────────────────────────────────────────
-Domanda utente
+Document (PDF / txt / md)
     │
     ▼
-┌──────────────────────┐
-│  Query Embedding     │  Stessa pipeline embedding della fase 1
-└──────────────────────┘
+┌─────────────────┐
+│  Text Chunking  │  Split into chunks of ~512 tokens with overlap
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  Embedding      │  IEmbeddingService → float[] vector
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  BLite Store    │  IVectorStore.StoreChunkAsync(chunk, vector)
+└─────────────────┘
+
+
+PHASE 2 — Search and answer (for each user question)
+
+User question
     │
     ▼
-┌──────────────────────┐
-│  ANN Search          │  Top-K chunk più simili (cosine similarity)
-│  (HNSW Vector Index) │  K = 3..5
-└──────────────────────┘
-    │
-    ▼
-┌──────────────────────┐
-│  Prompt Assembly     │  "Rispondi alla domanda usando SOLO questi estratti: ..."
-└──────────────────────┘
-    │
-    ▼
-┌──────────────────────┐
-│  LLM Generation      │  Ollama locale / OpenAI API / HuggingFace
-└──────────────────────┘
-    │
-    ▼
-Risposta + citazioni (documento:pagina)
+┌─────────────────┐
+│  Embedding      │  Embed the question → float[] vector
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  BLite Search   │  IVectorStore.SearchAsync(vector, topK: 5)
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  LLM Prompt     │  "Answer the question using ONLY the following passages: ..."
+└────────┬────────┘
+         │
+         ▼
+     Answer + citations
 ```
 
-### Requisiti minimi
+### Key interfaces
 
-1. Caricare almeno 3 documenti PDF → indicizzazione automatica
-2. Rispondere a domande in linguaggio naturale in ≤ 5 secondi (esclusa prima indicizzazione)
-3. La risposta include sempre la **citazione** del documento e della sezione sorgente
-4. Risponde "Non so" quando la risposta non è nei documenti caricati (no hallucination)
-5. Interfaccia minimale: CLI o web form
+```csharp
+public interface IEmbeddingService
+{
+    Task<float[]> EmbedAsync(string text, CancellationToken ct = default);
+}
 
-### Componenti da implementare
+public interface IVectorStore
+{
+    Task StoreChunkAsync(DocumentChunk chunk, float[] embedding, CancellationToken ct = default);
+    Task<IReadOnlyList<SearchResult>> SearchAsync(float[] queryEmbedding, int topK, CancellationToken ct = default);
+}
 
-#### A. Document Loader
-- Parser PDF: `PdfPig` (C#) o `PyMuPDF` (Python) o equivalente
-- Parser Word: `DocumentFormat.OpenXml` (C#) o `python-docx`
-- Chunking: sliding window su paragrafi, rispettando i confini di frase
+public record DocumentChunk(string DocumentId, int ChunkIndex, string Text, string Source);
+public record SearchResult(DocumentChunk Chunk, float Score);
+```
 
-#### B. Embedding Service
-Interfaccia `IEmbeddingService` con almeno una implementazione:
-- `OllamaEmbeddingService` — chiama `POST /api/embeddings` su Ollama locale
-- `OpenAiEmbeddingService` — usa `text-embedding-3-small` (1536 dim)
-- `LocalOnnxEmbeddingService` — MiniLM-L6-v2 via ONNX Runtime (384 dim)
+### Component A — Chunking
 
-#### C. Vector Store
-- Interfaccia `IVectorStore` con `Add(chunk, vector)` e `Search(query, k)`
-- Implementazione suggerita **BLite** con `HasVectorIndex(x => x.Embedding, dimensions: 384, metric: Cosine)`
-- Alternativa accettata: in-memory `List<(float[], Chunk)>` con brute-force cosine (per semplicità)
+- Split documents into chunks of ~512 tokens
+- Overlap of ~50 tokens between consecutive chunks
+- Preserve paragraph/sentence boundaries where possible
 
-#### D. RAG Orchestrator
-- Assembla il prompt con i chunk recuperati
-- Rispetta il limite di token del modello (conta approssimativamente i token)
-- Filtra i chunk sotto una soglia di similarità minima (es. cosine < 0.3 → scarta)
+### Component B — Embedding
 
-### Opzioni LLM
+The team chooses one of the following:
 
-| Opzione | Privacy | Costo |
-|---|---|---|
-| Ollama locale (`llama3.2:3b`, `phi4-mini`) | Alta — tutto locale | Gratis |
-| OpenAI `gpt-4o-mini` | Dati inviati a OpenAI | ~$0.002/query |
-| HuggingFace Inference API | Dati inviati a HF | Free tier |
+| Option | Privacy | Cost | Notes |
+|---|---|---|---|
+| `all-MiniLM-L6-v2` (local, ONNX/Fastembed) | High — everything local | Free | Recommended for this project |
+| OpenAI `text-embedding-3-small` | Data sent to OpenAI | ~$0.02/1M tokens | |
+| HuggingFace Inference API | Data sent to HF | Free tier | |
 
-**Consigliato per il progetto:** Ollama locale — nessun costo, privacy totale, adatto
-a documenti aziendali.
+**Recommended**: `all-MiniLM-L6-v2` — no cost, full privacy, suitable for corporate documents.
+
+### Component C — BLite Vector Store
+
+Example BLite storage code:
+
+```csharp
+var col = engine.GetOrCreateCollection("chunks");
+
+// Store
+await col.InsertAsync(new BsonDocument
+{
+    ["documentId"] = chunk.DocumentId,
+    ["chunkIndex"]  = chunk.ChunkIndex,
+    ["text"]        = chunk.Text,
+    ["source"]      = chunk.Source,
+    ["embedding"]   = new BsonArray(embedding.Select(f => (BsonValue)f))
+});
+
+// Search (HNSW)
+var results = await col.VectorSearchAsync("embedding", queryVector, topK: 5);
+```
+
+### Component D — LLM for answers
+
+The team chooses one of the following:
+
+| Option | Notes |
+|---|---|
+| Local Ollama (`llama3.2:3b` or `phi3:mini`) | Recommended — fully offline |
+| OpenAI `gpt-4o-mini` | Fast and cheap, but requires internet |
+| HuggingFace Inference API | Free tier available |
+
+### Minimum requirements
+
+1. Index at least 3 real documents (PDF or text) of at least 5 pages each
+2. Answer questions in natural language with passage citations
+3. Processing entirely local (no mandatory cloud APIs)
+4. Response time for a question: < 30 seconds on a standard laptop
+5. Simple UI (CLI or web form or desktop)
+
+### Advanced requirements (optional)
+
+- Support for multi-document queries ("From all loaded documents, which one mentions X?")
+- Chat history: the LLM remembers the last N exchanges
+- Filter by document during search (e.g. "search only in document X")
+- Performance evaluation with a set of 10 Q&A pairs
 
 ---
 
-## 📦 Output Atteso
+## 📦 Expected Output
 
-- Sistema funzionante con almeno 3 documenti di test (es. RFC, manuale utente, articolo)
-- Almeno 10 domande/risposte documentate con citazioni corrette
-- README con: piattaforma scelta, modello LLM usato, istruzioni di setup
-- Valutazione qualitativa: percentuale di risposte corrette e pertinenti sul set di test
+- Working application with indexed documentation
+- At least 3 test documents with 10 pre-defined Q&A pairs for evaluation
+- README with: platform, AI stack, chunking choices, execution instructions
+- Qualitative evaluation: % of correct answers on the 10 test pairs
 
-## 📚 Riferimenti
+## 📚 References
 
-- Ollama: https://ollama.com/docs
-- BLite Vector Search: `BLite/README.md` sezione "AI-Ready Vector Search"
-- MiniLM-L6-v2 (ONNX): https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2
-- PdfPig (C#): https://github.com/UglyToad/PdfPig
-- Retrieval-Augmented Generation (paper originale): https://arxiv.org/abs/2005.11401
+- RAG — original paper: https://arxiv.org/abs/2005.11401
+- BLite HNSW: `BLite.Core.VectorIndex` (in the BLite repository)
+- Fastembed (ONNX embeddings for .NET): https://github.com/Anilturaga/fastembed-sharp
+- Ollama: https://ollama.com
+- LangChain RAG tutorial (Python, as conceptual reference): https://python.langchain.com/docs/tutorials/rag/

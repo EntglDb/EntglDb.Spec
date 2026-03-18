@@ -1,69 +1,69 @@
-# Progetto: EntglDb.Kotlin — Implementazione da zero
+# Project: EntglDb.Kotlin — Implementation from scratch
 
-## 🎯 Obiettivo
+## 🎯 Goal
 
-Implementare da zero la libreria Kotlin di EntglDb, portando tutte le funzionalità
-della versione di riferimento `.Net` (v1.0.0) su Android e JVM, a partire dallo
-scaffold già predisposto nel repository `EntglDb.Kotlin`.
+Implement the Kotlin library for EntglDb from scratch, porting all features
+of the reference `.Net` version (v1.0.0) to Android and JVM, starting from the
+scaffold already provided in the `EntglDb.Kotlin` repository.
 
-L'implementazione di riferimento completa è disponibile in `EntglDb.Net`.
+The complete reference implementation is available in `EntglDb.Net`.
 
 ---
 
-## 📊 Stato di partenza
+## 📊 Starting point
 
-| Componente | Stato |
+| Component | Status |
 |---|---|
-| `protocol/` | ✅ Definizione Protobuf v5 già presente e compilata |
-| `core/` | 🔲 Da implementare |
-| `persistence-sqlite/` | 🔲 Da implementare |
-| `network/` | 🔲 Da implementare |
-| `app/` | 🔲 Da implementare |
+| `protocol/` | ✅ Protobuf v5 definition already present and compiled |
+| `core/` | 🔲 To be implemented |
+| `persistence-sqlite/` | 🔲 To be implemented |
+| `network/` | 🔲 To be implemented |
+| `app/` | 🔲 To be implemented |
 
 ---
 
-## 🛠️ Specifiche Tecniche
+## 🛠️ Technical Specifications
 
-### Modulo `core` — Engine
+### Module `core` — Engine
 
-Il core è il cuore dell'intera libreria. Implementa le strutture dati e la logica
-di sincronizzazione, senza dipendenze da rete o storage.
+The core is the heart of the entire library. It implements the data structures and
+synchronization logic, with no dependencies on networking or storage.
 
-**Classi principali da implementare:**
+**Main classes to implement:**
 
 #### 1. `HlcTimestamp` — Hybrid Logical Clock
-- Tre componenti: `wall: Long`, `logic: Int`, `node: String`
-- Metodo `tick(wall: Long)`: avanza il clock garantendo monotonicità
-- Metodo `receive(remote: HlcTimestamp, wall: Long)`: aggiorna il clock alla ricezione di un messaggio
-- Serializzazione tramite `kotlinx.serialization`
+- Three components: `wall: Long`, `logic: Int`, `node: String`
+- Method `tick(wall: Long)`: advances the clock guaranteeing monotonicity
+- Method `receive(remote: HlcTimestamp, wall: Long)`: updates the clock upon receiving a message
+- Serialization via `kotlinx.serialization`
 
 #### 2. `VectorClock`
 - Map `nodeId → HlcTimestamp`
-- Metodo `dominates(other: VectorClock)`: confronto causale
-- Metodo `merge(other: VectorClock)`: unione prendendo il max per ogni nodo
+- Method `dominates(other: VectorClock)`: causal comparison
+- Method `merge(other: VectorClock)`: union taking the max per node
 
 #### 3. `OplogEntry`
-- Campi: `collection`, `key`, `operation` (Put/Delete), `jsonData`, `hlc`, `hash`, `previousHash`
-- `hash` calcolato con SHA-256 su `(previousHash + collection + key + operation + jsonData + hlc)`
-- Verifica dell'integrità della catena: `verifyChain(entries: List<OplogEntry>): Boolean`
+- Fields: `collection`, `key`, `operation` (Put/Delete), `jsonData`, `hlc`, `hash`, `previousHash`
+- `hash` computed with SHA-256 over `(previousHash + collection + key + operation + jsonData + hlc)`
+- Chain integrity verification: `verifyChain(entries: List<OplogEntry>): Boolean`
 
 #### 4. `IConflictResolver`
-- Interfaccia con metodo `resolve(base: String?, local: String, remote: String): String`
-- Implementazione `LastWriteWinsResolver`: usa l'HLC per selezionare il winner
-- Implementazione `RecursiveMergeResolver`: unione ricorsiva dei campi JSON non in conflitto
+- Interface with method `resolve(base: String?, local: String, remote: String): String`
+- Implementation `LastWriteWinsResolver`: uses the HLC to select the winner
+- Implementation `RecursiveMergeResolver`: recursive merge of non-conflicting JSON fields
 
 #### 5. `PeerDatabase`
-- Gestisce una `Collection` di `PeerCollection`
-- Metodi: `put(collection, key, json)`, `delete(collection, key)`, `find(collection, key)`
-- Osserva le scritture locali e genera `OplogEntry` (CDC pattern)
+- Manages a `Collection` of `PeerCollection`
+- Methods: `put(collection, key, json)`, `delete(collection, key)`, `find(collection, key)`
+- Observes local writes and generates `OplogEntry` (CDC pattern)
 
 ---
 
-### Modulo `persistence-sqlite` — Storage
+### Module `persistence-sqlite` — Storage
 
-Implementa `IPeerStorage` usando `androidx.sqlite:sqlite-ktx`.
+Implements `IPeerStorage` using `androidx.sqlite:sqlite-ktx`.
 
-**Tabelle da creare:**
+**Tables to create:**
 ```sql
 CREATE TABLE oplog (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,59 +94,59 @@ CREATE TABLE documents (
 
 ---
 
-### Modulo `network` — P2P Networking
+### Module `network` — P2P Networking
 
-Usa Ktor TCP + Brotli compression + crittografia simmetrica.
+Uses Ktor TCP + Brotli compression + symmetric encryption.
 
-#### 1. Handshake (Protocollo v5)
-- I messaggi sono framed con il `MessageType` enum (1 byte) + 4 byte length + payload Protobuf
-- Handshake: scambio di `node_id`, `auth_token`, `supported_compression`, `interesting_collections`
-- Crittografia: exchange di chiave via ECDH → AES-256-GCM per il payload (SecureEnvelope)
+#### 1. Handshake (Protocol v5)
+- Messages are framed with the `MessageType` enum (1 byte) + 4-byte length + Protobuf payload
+- Handshake: exchange of `node_id`, `auth_token`, `supported_compression`, `interesting_collections`
+- Encryption: ECDH key exchange → AES-256-GCM for the payload (SecureEnvelope)
 
 #### 2. `TcpPeerClient`
-- Connessione TCP a un peer remoto
-- Gestione reconnect automatica con backoff esponenziale
-- Metodi: `pushChanges(entries)`, `pullChanges(since)`, `getVectorClock()`
+- TCP connection to a remote peer
+- Automatic reconnect handling with exponential backoff
+- Methods: `pushChanges(entries)`, `pullChanges(since)`, `getVectorClock()`
 
 #### 3. `TcpPeerServer`
-- Accetta connessioni TCP in ingresso (Ktor server socket)
-- Dispatching dei messaggi al `SyncOrchestrator`
+- Accepts incoming TCP connections (Ktor server socket)
+- Message dispatching to the `SyncOrchestrator`
 
 #### 4. `UdpDiscovery`
-- Broadcast UDP sulla LAN (porta 7890) per scoprire peers
-- Messaggio di discovery: JSON con `nodeId` e porta TCP
-- Notifica il `SyncOrchestrator` alla scoperta di nuovi peers
+- UDP broadcast on the LAN (port 7890) to discover peers
+- Discovery message: JSON with `nodeId` and TCP port
+- Notifies the `SyncOrchestrator` upon discovering new peers
 
 #### 5. `SyncOrchestrator`
-- Gossip loop ogni 2 secondi
-- Per ogni peer connesso: invia e riceve `OplogEntry` mancanti
-- Gap Recovery: se il peer è troppo indietro, invia uno snapshot
+- Gossip loop every 2 seconds
+- For each connected peer: sends and receives missing `OplogEntry` records
+- Gap Recovery: if the peer is too far behind, sends a snapshot
 
 ---
 
-### Modulo `app` — Sample Android
+### Module `app` — Sample Android
 
-Applicazione Android con Jetpack Compose che dimostra la sincronizzazione in tempo reale
-tra dispositivi sulla stessa LAN.
+Android application with Jetpack Compose that demonstrates real-time synchronization
+between devices on the same LAN.
 
-**Funzionalità minime:**
-- Lista TODO condivisa tra due dispositivi
-- Indicatore di stato connessione (online/offline)
-- Visualizzazione del VectorClock corrente
-- Risoluzione manuale di conflitti (dialog di scelta)
+**Minimum features:**
+- Shared TODO list between two devices
+- Connection status indicator (online/offline)
+- Current VectorClock display
+- Manual conflict resolution (selection dialog)
 
 ---
 
-## 📦 Output Atteso
+## 📦 Expected Output
 
-- Implementazione compilante di tutti e quattro i moduli
-- Test unitari per `core`: `VectorClock`, `HlcTimestamp`, `OplogEntry` (verifica chain)
-- Test di integrazione: due istanze `PeerDatabase` che si sincronizzano in-process
-- App Android funzionante con demo di sync LAN
+- Compiling implementation of all four modules
+- Unit tests for `core`: `VectorClock`, `HlcTimestamp`, `OplogEntry` (chain verification)
+- Integration test: two `PeerDatabase` instances that synchronize in-process
+- Working Android app with LAN sync demo
 
-## 📚 Riferimenti
+## 📚 References
 
-- `EntglDb.Net/src/EntglDb.Core/` — implementazione C# di riferimento
-- `EntglDb.Net/src/EntglDb.Network/` — implementazione rete di riferimento
+- `EntglDb.Net/src/EntglDb.Core/` — reference C# implementation
+- `EntglDb.Net/src/EntglDb.Network/` — reference network implementation
 - `protocol/src/main/proto/sync.proto` — protocollo v5 definito
 - `EntglDb.Net/README.md` — architettura generale
