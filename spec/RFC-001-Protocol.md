@@ -4,9 +4,9 @@
 | :--- | :--- |
 | **RFC ID** | 001 |
 | **Title** | EntglDb Wire Protocol & Security Specification |
-| **Status** | Draft |
-| **Protocol Version** | v0.7.0 |
-| **Date** | 2026-01-21 |
+| **Status** | Active |
+| **Protocol Version** | v1.0 |
+| **Date** | 2026-03-19 |
 
 ## 1. Introduction
 

@@ -1,7 +1,7 @@
 <template>
   <div class="spec-content">
     <h1>Getting Started</h1>
-    <p class="lead">EntglDb is a decentralized, offline-first peer-to-peer database. Choose your platform to get started.</p>
+    <p class="lead">Entgl is a peer-to-peer mesh platform. EntglDb, its flagship service, provides real-time database synchronization across devices. Choose your platform to get started.</p>
 
     <div class="tabs">
       <div class="tab-header">
@@ -12,27 +12,114 @@
       
       <!-- .NET Content -->
       <div class="tab-content" v-if="activeTab === 'net'">
+        <h2>Requirements</h2>
+        <p>EntglDb.Net v2.x targets <strong>.NET Standard 2.1</strong> and <strong>.NET 10.0</strong>. The persistence and ASP.NET integration packages require <strong>.NET 10.0</strong>.</p>
+
         <h2>Installation</h2>
-        <p>EntglDb is available found on NuGet.</p>
-        <pre><code class="language-bash">dotnet add package EntglDb.Core
+        <p>Install the packages that match your deployment scenario:</p>
+        <pre><code class="language-bash"># Core sync engine (always required)
+dotnet add package EntglDb.Core
+dotnet add package EntglDb.Sync
 dotnet add package EntglDb.Network
-dotnet add package EntglDb.Persistence.Sqlite</code></pre>
 
-        <h2>Basic Usage</h2>
-        <h3>1. Initialize Store</h3>
-        <pre><code class="language-csharp">using EntglDb.Core;
-using EntglDb.Persistence.Sqlite;
-using EntglDb.Network.Security;
+# Persistence — choose one or both:
+dotnet add package EntglDb.Persistence.BLite          # Embedded BLite (net10.0)
+dotnet add package EntglDb.Persistence.EntityFramework # EF Core / PostgreSQL (net10.0)
 
-// Choose conflict resolver
-var resolver = new RecursiveNodeMergeConflictResolver();
-var store = new SqlitePeerStore("Data Source=my-node.db", logger, resolver);</code></pre>
+# ASP.NET Core hosting (net10.0, optional)
+dotnet add package EntglDb.AspNet</code></pre>
 
-        <h3>2. Configure Network</h3>
-        <pre><code class="language-csharp">var services = new ServiceCollection();
-services.AddSingleton&lt;IPeerStore>(store);
-services.AddSingleton&lt;IPeerHandshakeService, SecureHandshakeService>();
-services.AddEntglDbNetwork("node-1", 5001, "my-secret-cluster-key");</code></pre>
+        <h2>1. Define your Document Store</h2>
+        <p>Create a class that extends <code>BLiteDocumentStore&lt;T&gt;</code> and watch the collections you want to sync.</p>
+        <pre><code class="language-csharp">using EntglDb.Persistence.BLite;
+
+public class AppDbContext : BLiteDbContext
+{
+    public AppDbContext(string path) : base(path) { }
+}
+
+public class AppDocumentStore : BLiteDocumentStore&lt;AppDbContext&gt;
+{
+    public AppDocumentStore(AppDbContext ctx, IEntglDbSyncManager sync)
+        : base(ctx, sync)
+    {
+        // Register each collection you want synced across peers
+        WatchCollection&lt;TodoItem&gt;("todos");
+        WatchCollection&lt;Note&gt;("notes");
+    }
+}</code></pre>
+
+        <h2>2. Register Services</h2>
+        <p>Wire everything up in your DI container. For ASP.NET Core, use <code>Program.cs</code>:</p>
+        <pre><code class="language-csharp">using EntglDb.AspNet;
+using EntglDb.Network;
+using EntglDb.Persistence.BLite;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services
+    .AddEntglDbCore()
+    .AddEntglDbBLite&lt;AppDbContext, AppDocumentStore&gt;(
+        sp =&gt; new AppDbContext("myapp.blite"))
+    .AddEntglDbNetwork&lt;StaticPeerNodeConfigurationProvider&gt;();
+
+var app = builder.Build();
+app.UseEntglDb();
+app.Run();</code></pre>
+
+        <h2>3. Provide Peer Configuration</h2>
+        <p>Implement <code>IPeerNodeConfigurationProvider</code> or use the built-in <code>StaticPeerNodeConfigurationProvider</code> for fixed peer lists:</p>
+        <pre><code class="language-csharp">// In appsettings.json:
+{
+  "EntglDb": {
+    "NodeId": "node-kitchen",
+    "Port": 25000,
+    "AuthToken": "my-shared-cluster-secret",
+    "KnownPeers": [
+      { "Host": "192.168.1.10", "Port": 25000 },
+      { "Host": "192.168.1.11", "Port": 25000 }
+    ]
+  }
+}</code></pre>
+
+        <h2>4. Use the Document Store</h2>
+        <pre><code class="language-csharp">// Inject AppDocumentStore via DI
+public class TodoService
+{
+    private readonly AppDocumentStore _store;
+
+    public TodoService(AppDocumentStore store) =&gt; _store = store;
+
+    public async Task AddTodoAsync(TodoItem item)
+    {
+        await _store.UpsertAsync("todos", item.Id, item);
+    }
+
+    public async Task&lt;IEnumerable&lt;TodoItem&gt;&gt; GetAllAsync()
+    {
+        return await _store.QueryAsync&lt;TodoItem&gt;("todos");
+    }
+}</code></pre>
+
+        <p>Changes are automatically propagated to all peers in the mesh via gossip synchronization (every ~2 seconds). Conflict resolution uses Last-Write-Wins (LWW) by default; implement <code>IConflictResolver</code> for custom merge strategies.</p>
+
+        <h2>Console / Non-ASP.NET</h2>
+        <pre><code class="language-csharp">var host = Host.CreateDefaultBuilder()
+    .ConfigureServices(services =&gt;
+    {
+        services
+            .AddEntglDbCore()
+            .AddEntglDbBLite&lt;AppDbContext, AppDocumentStore&gt;(
+                sp =&gt; new AppDbContext("myapp.blite"))
+            .AddEntglDbNetwork&lt;StaticPeerNodeConfigurationProvider&gt;();
+    })
+    .Build();
+
+await host.RunAsync();</code></pre>
+
+        <div class="info-box">
+          <strong>⚠️ Breaking change in v2.0:</strong> Dropped netstandard2.0, .NET 6, and .NET 8. Minimum is .NET Standard 2.1 / .NET 10.
+        </div>
       </div>
 
       <!-- Node.js Content -->
@@ -66,9 +153,9 @@ server.start();</code></pre>
       <div class="tab-content" v-if="activeTab === 'kotlin'">
         <h2>Installation</h2>
         <p>Add dependencies to your <code>build.gradle.kts</code>.</p>
-        <pre><code class="language-kotlin">    implementation("com.entgldb:core:0.8.0")
-    implementation("com.entgldb:network:0.8.0")
-    implementation("com.entgldb:persistence-sqlite-android:0.8.0")
+        <pre><code class="language-kotlin">    implementation("com.entgldb:core:0.9.0")
+    implementation("com.entgldb:network:0.9.0")
+    implementation("com.entgldb:persistence-sqlite-android:0.9.0")
 }</code></pre>
 
         <h2>Platform Setup</h2>
@@ -176,5 +263,15 @@ h2 {
 h3 {
     margin-top: 1.5rem;
     color: var(--text-secondary);
+}
+
+.info-box {
+  margin-top: 2rem;
+  padding: 1rem 1.25rem;
+  border-left: 4px solid var(--accent-primary);
+  background: rgba(139, 92, 246, 0.08);
+  border-radius: 0 6px 6px 0;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
 }
 </style>

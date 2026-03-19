@@ -17,17 +17,18 @@ const goGithub = () => window.open('https://github.com/EntglDb', '_blank');
     
     <div class="container hero-content">
       <div class="badge animate-fade-in" style="animation-delay: 0.1s">
-        <span class="badge-dot"></span> v0.8.0 Released
+        <span class="badge-dot"></span> v2.1 — Stable
       </div>
       
       <h1 class="hero-title animate-fade-in" style="animation-delay: 0.2s">
-        The <span class="brand-gradient">Mesh Database</span><br/>
-        for Local-First Apps
+        The <span class="brand-gradient">Peer-to-Peer</span><br/>
+        Mesh Platform
       </h1>
       
       <p class="hero-subtitle animate-fade-in" style="animation-delay: 0.3s">
-        Synchronize data directly between devices without a cloud server.
-        Built for resilience, speed, and privacy.
+        A secure, self-organizing mesh network that connects devices directly.
+        No cloud required. Build distributed services — starting with
+        real-time database synchronization.
       </p>
       
       <div class="hero-actions animate-fade-in" style="animation-delay: 0.4s">
@@ -37,18 +38,18 @@ const goGithub = () => window.open('https://github.com/EntglDb', '_blank');
 
       <div class="hero-stats animate-fade-in" style="animation-delay: 0.6s">
         <div class="stat">
-          <div class="stat-value">P2P</div>
-          <div class="stat-label">Networking</div>
+          <div class="stat-value">Mesh</div>
+          <div class="stat-label">Self-Healing Network</div>
         </div>
         <div class="stat-sep"></div>
         <div class="stat">
-          <div class="stat-value">UDP</div>
-          <div class="stat-label">Discovery</div>
+          <div class="stat-value">E2E</div>
+          <div class="stat-label">Encrypted Transport</div>
         </div>
         <div class="stat-sep"></div>
         <div class="stat">
-          <div class="stat-value">AES</div>
-          <div class="stat-label">Encryption</div>
+          <div class="stat-value">4</div>
+          <div class="stat-label">Platform SDKs</div>
         </div>
       </div>
     </div>

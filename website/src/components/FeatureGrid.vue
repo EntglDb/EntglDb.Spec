@@ -1,63 +1,145 @@
 <script setup lang="ts">
-const features = [
+const platformFeatures = [
   {
-    title: 'Mesh Networking',
-    desc: 'Nodes automatically discover each other via UDP (Port 25000) and form a resilient mesh network without central servers.',
-    icon: '🔗'
+    title: 'Auto-Discovery',
+    desc: 'Nodes find each other on the local network via UDP broadcast (Port 25000). Zero configuration — plug in a device, it joins the mesh.',
+    icon: '📡'
   },
   {
-    title: 'Offline-First',
-    desc: 'Read and write data locally. Changes adhere to the CAP theorem (AP) and synchronize automatically when connectivity is restored.',
-    icon: '💾'
-  },
-  {
-    title: 'End-to-End Security',
-    desc: 'All peer-to-peer traffic is secured with ECDH Key Exchange and AES-256-GCM encryption. Zero-trust architecture.',
+    title: 'Encrypted Transport',
+    desc: 'Every connection is secured with ECDH P-256 key exchange and AES-256-GCM encryption. Ephemeral session keys provide forward secrecy.',
     icon: '🛡️'
   },
   {
-    title: 'Recursive Merge',
-    desc: 'Advanced conflict resolution. JSON objects are merged field-by-field, preserving non-conflicting changes from multiple devices.',
+    title: 'Self-Healing Mesh',
+    desc: 'No central server — every node is equal. The network automatically detects failures, re-routes, and recovers when peers rejoin.',
+    icon: '🔗'
+  },
+  {
+    title: 'Platform Services',
+    desc: 'Built-in leader election (Bully Algorithm), remote peer management, gossip protocol, and dynamic reconfiguration — building blocks for any distributed service.',
+    icon: '⚙️'
+  }
+]
+
+const syncFeatures = [
+  {
+    title: 'Offline-First Sync',
+    desc: 'Read and write locally without any connection. Changes synchronize automatically via gossip when peers reconnect. AP model — always available.',
+    icon: '💾'
+  },
+  {
+    title: 'Smart Conflict Resolution',
+    desc: 'Choose Last-Write-Wins for simplicity, or Recursive Merge for field-level resolution with intelligent array merging by ID.',
     icon: '🔀'
   },
   {
     title: 'Cross-Platform',
-    desc: 'Implementations available for .NET 8, Android (Kotlin), and Node.js. Single protocol, multiple ecosystems.',
+    desc: '.NET 10 (stable v2.1), Kotlin/Android, Node.js/TypeScript, and React Native. One canonical protocol, four ecosystems.',
     icon: '🌍'
   },
   {
-    title: 'Document Oriented',
-    desc: 'Store data as flexible JSON documents. No rigid schemas required, perfect for rapid application development.',
-    icon: '📄'
+    title: 'DocumentStore + OpLog',
+    desc: 'Hash-chained operation log with vector clocks, CDC-based change tracking, ContentHash integrity verification (SHA-256), and point-in-time snapshots.',
+    icon: '📋'
   }
 ]
 </script>
 
 <template>
-  <section class="features-section">
-    <div class="container">
-      <div class="grid">
-        <div v-for="(feat, index) in features" :key="index" class="feature-card glass-panel animate-fade-in" :style="{ animationDelay: (0.2 + index * 0.1) + 's' }">
-          <div class="icon">{{ feat.icon }}</div>
-          <h3>{{ feat.title }}</h3>
-          <p>{{ feat.desc }}</p>
+  <div class="features-wrapper">
+    <!-- Section 1: The Mesh Infrastructure -->
+    <section class="features-section">
+      <div class="container">
+        <div class="section-header animate-fade-in">
+          <span class="section-label">The Foundation</span>
+          <h2>Mesh Infrastructure</h2>
+          <p class="section-desc">A secure, decentralized network layer that connects devices directly. No cloud, no single point of failure. Every node is equal.</p>
+        </div>
+        <div class="grid">
+          <div v-for="(feat, index) in platformFeatures" :key="'p-'+index" class="feature-card glass-panel animate-fade-in" :style="{ animationDelay: (0.2 + index * 0.1) + 's' }">
+            <div class="icon">{{ feat.icon }}</div>
+            <h3>{{ feat.title }}</h3>
+            <p>{{ feat.desc }}</p>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+
+    <!-- Section 2: EntglDb Sync — The Flagship Service -->
+    <section class="features-section service-section">
+      <div class="container">
+        <div class="section-header animate-fade-in">
+          <span class="section-label">Built on the Mesh</span>
+          <h2>EntglDb Sync</h2>
+          <p class="section-desc">Real-time database synchronization — the first and most mature service running on the Entgl mesh. Production-ready at v2.1.</p>
+        </div>
+        <div class="grid">
+          <div v-for="(feat, index) in syncFeatures" :key="'s-'+index" class="feature-card glass-panel animate-fade-in" :style="{ animationDelay: (0.2 + index * 0.1) + 's' }">
+            <div class="icon">{{ feat.icon }}</div>
+            <h3>{{ feat.title }}</h3>
+            <p>{{ feat.desc }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
 </template>
 
 <style scoped>
-.features-section {
-  padding: 100px 0;
+.features-wrapper {
   position: relative;
   z-index: 10;
 }
 
+.features-section {
+  padding: 100px 0 60px;
+}
+
+.service-section {
+  padding-top: 40px;
+  padding-bottom: 100px;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.section-label {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent-secondary);
+  margin-bottom: 12px;
+}
+
+.service-section .section-label {
+  color: var(--accent-primary);
+}
+
+.section-header h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.section-desc {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 28px;
 }
 
 .feature-card {

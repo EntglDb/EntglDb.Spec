@@ -8,8 +8,8 @@ import { RouterView } from 'vue-router'
     <header class="main-header glass-panel">
       <div class="container header-content">
         <router-link to="/" class="logo-link">
-          <img src="./assets/logo.png" alt="EntglDb" class="logo-img" />
-          <div class="logo-text">EntglDb<span class="dot">.</span></div>
+          <img src="./assets/logo.png" alt="Entgl" class="logo-img" />
+          <div class="logo-text">Entgl<span class="db">Db</span><span class="dot">.</span></div>
         </router-link>
         <nav>
           <router-link to="/">Home</router-link>
@@ -30,7 +30,7 @@ import { RouterView } from 'vue-router'
 
     <footer class="main-footer">
       <div class="container">
-        <p>© 2026 EntglDb Project. Open Source (MIT).</p>
+        <p>© 2026 Entgl Project. Open Source (MIT).</p>
       </div>
     </footer>
   </div>
@@ -85,6 +85,11 @@ import { RouterView } from 'vue-router'
   font-size: 1.25rem;
   letter-spacing: -0.5px;
   color: var(--text-primary);
+}
+
+.logo-text .db {
+  font-weight: 400;
+  color: var(--text-muted);
 }
 
 .logo-text .dot {

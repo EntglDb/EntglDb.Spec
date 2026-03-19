@@ -14,7 +14,7 @@ const router = createRouter({
             name: 'docs',
             component: () => import('vue-router').then(m => m.RouterView), // Use simple passthrough
             children: [
-                { path: '', redirect: '/docs/v0.8.0/getting-started' },
+                { path: '', redirect: '/docs/v2.1/getting-started' },
                 {
                     path: ':version',
                     component: () => import('../views/Docs.vue'), // Layout applies here

@@ -5,9 +5,9 @@ import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
 
-const versions = ['v0.8.0', 'v0.7.0']
+const versions = ['v2.1', 'v2.0', 'v0.9', 'v0.8.0', 'v0.7.0']
 const currentVersion = computed(() => {
-  return (route.params.version as string) || 'v0.8.0'
+  return (route.params.version as string) || 'v2.1'
 })
 
 const menu = [

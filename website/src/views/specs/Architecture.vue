@@ -1,15 +1,32 @@
 <template>
   <div class="spec-content">
     <h1>Architecture</h1>
-    <p class="lead">EntglDb is a leaderless, peer-to-peer database designed for local-first applications.</p>
+    <p class="lead">Entgl is a peer-to-peer mesh platform. EntglDb, its flagship service, provides leaderless database synchronization for local-first applications.</p>
+
+    <!-- Platform Layer -->
+    <section>
+        <h2>Platform Architecture</h2>
+        <p>Entgl is structured in two layers: a reusable <strong>mesh infrastructure</strong> and the <strong>services</strong> built on top of it.</p>
+        <div class="flow-diagram">
+            <div class="step">
+                <div style="margin-bottom: 8px; color: var(--accent-secondary); font-weight: 600;">Mesh Infrastructure</div>
+                Auto-Discovery • Encrypted Transport • Gossip Protocol • Leader Election • Peer Management
+            </div>
+            <div class="step" style="margin-top: 12px;">
+                <div style="margin-bottom: 8px; color: var(--accent-primary); font-weight: 600;">Services (built on the mesh)</div>
+                EntglDb Sync (v2.1 — stable) • File Sync (planned) • Messaging (planned)
+            </div>
+        </div>
+    </section>
 
     <!-- Concepts -->
     <section>
         <h2>Design Philosophy</h2>
         <ul>
-            <li><strong>Local First:</strong> Reads and writes happen locally on the device (SQLite), ensuring zero-latency and offline availability.</li>
-            <li><strong>Peer-to-Peer:</strong> No central server. Every node is equal.</li>
-            <li><strong>Eventually Consistent:</strong> Data converges across the cluster using Conflict-Free Replicated Data Types (CRDT) principals.</li>
+            <li><strong>Local First:</strong> Reads and writes happen locally on the device, ensuring zero-latency and offline availability.</li>
+            <li><strong>Peer-to-Peer:</strong> No central server. Every node is equal. The mesh is self-organizing and self-healing.</li>
+            <li><strong>Eventually Consistent:</strong> Data converges across the cluster using Conflict-Free Replicated Data Types (CRDT) principles.</li>
+            <li><strong>Platform, not Product:</strong> The mesh infrastructure (discovery, transport, gossip) is independent from database sync. New services can be built on the same network.</li>
         </ul>
     </section>
 
@@ -40,7 +57,7 @@
     <section>
         <h2>Data Flow</h2>
         <div class="flow-diagram">
-            <div class="step">App Write ➔ Local SQLite ➔ OpLog ➔ Sync Orchestrator ➔ TCP Push ➔ Remote Peer</div>
+            <div class="step">App Write ➤ Local Store ➤ OpLog (hash-chained) ➤ Sync Orchestrator ➤ TCP Push ➤ Remote Peer</div>
         </div>
     </section>
 
